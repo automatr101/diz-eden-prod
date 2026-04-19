@@ -1,0 +1,148 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=Jost:wght@300;400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --font-display: 'Cormorant Garamond', serif;
+    --font-body: 'Jost', sans-serif;
+
+    /* Brand palette — Dark Green / Gold / White */
+    --color-eden-dark: 152 35% 10%;
+    --color-eden-green: 152 30% 20%;
+    --color-eden-green-light: 152 20% 35%;
+    --color-gold: 40 65% 55%;
+    --color-gold-dark: 38 55% 42%;
+    --color-cream: 40 30% 96%;
+    --color-warm-white: 0 0% 100%;
+    --color-stone: 40 12% 82%;
+    --color-mid: 150 4% 45%;
+    --color-light-mid: 150 4% 60%;
+    --color-section: 40 20% 95%;
+
+    --color-success: 145 60% 42%;
+    --color-error: 4 65% 47%;
+    --color-warning: 32 68% 50%;
+
+    /* Shadcn semantic mapping — Dark Mode Default */
+    --background: 152 35% 10%;
+    --foreground: 40 30% 96%;
+
+    --card: 152 30% 12%;
+    --card-foreground: 40 30% 96%;
+
+    --popover: 152 30% 12%;
+    --popover-foreground: 40 30% 96%;
+
+    --primary: 40 65% 55%;
+    --primary-foreground: 152 35% 10%;
+
+    --secondary: 152 20% 18%;
+    --secondary-foreground: 40 30% 96%;
+
+    --muted: 152 20% 15%;
+    --muted-foreground: 150 4% 60%;
+
+    --accent: 40 65% 55%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 4 65% 47%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 152 20% 18%;
+    --input: 152 20% 18%;
+    --ring: 40 65% 55%;
+
+    --radius: 0.5rem;
+
+    --sidebar-background: 152 35% 8%;
+    --sidebar-foreground: 40 30% 96%;
+    --sidebar-primary: 40 65% 55%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 152 30% 20%;
+    --sidebar-accent-foreground: 40 30% 96%;
+    --sidebar-border: 152 20% 15%;
+    --sidebar-ring: 40 65% 55%;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-body antialiased;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+  }
+}
+
+@layer components {
+  .text-display-2xl {
+    font-family: var(--font-display);
+    font-size: clamp(3rem, 8vw, 4.5rem);
+    line-height: 1.0;
+    font-weight: 300;
+  }
+  .text-display-xl {
+    font-family: var(--font-display);
+    font-size: clamp(2.25rem, 6vw, 3.5rem);
+    line-height: 1.05;
+    font-weight: 300;
+  }
+  .text-display-lg {
+    font-family: var(--font-display);
+    font-size: clamp(1.75rem, 5vw, 2.5rem);
+    line-height: 1.1;
+    font-weight: 300;
+  }
+  .text-display-md {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    line-height: 1.15;
+    font-weight: 400;
+  }
+  .text-display-sm {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    line-height: 1.2;
+    font-weight: 400;
+  }
+  .text-body-xl {
+    font-family: var(--font-body);
+    font-size: 1.125rem;
+    line-height: 1.7;
+    font-weight: 300;
+  }
+  .text-body-lg {
+    font-family: var(--font-body);
+    font-size: 1rem;
+    line-height: 1.7;
+    font-weight: 300;
+  }
+  .text-body-md {
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    line-height: 1.6;
+    font-weight: 400;
+  }
+  .text-label-lg {
+    font-family: var(--font-body);
+    font-size: 0.8125rem;
+    line-height: 1.4;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+  }
+  .text-label-sm {
+    font-family: var(--font-body);
+    font-size: 0.6875rem;
+    line-height: 1.4;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+  }
+}
