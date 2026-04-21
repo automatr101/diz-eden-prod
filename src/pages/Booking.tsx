@@ -72,44 +72,11 @@ export default function Booking() {
 
   const [basePrice, setBasePrice] = useState(apartment.basePrice);
 
-  useEffect(() => {
-    async function fetchPricing() {
-      const { data } = await supabase.from('settings').select('*').eq('key', 'nightly_rate').single();
-      if (data && data.value) {
-        setBasePrice(Number(data.value));
-      }
-    }
-    fetchPricing();
-  }, []);
-
-  // Real-time availability check
-  useEffect(() => {
-    if (checkIn && checkOut && nights >= 1) {
-      checkAvailability();
-    } else {
-      setAvailabilityError("");
-    }
-  }, [checkIn, checkOut, nights]);
-
-  useEffect(() => {
-    // If arrived with dates pre-filled, scroll to details to save user a gesture
-    if (initCheckIn && initCheckOut && step === "details") {
-      const timer = setTimeout(() => {
-        const details = document.getElementById("guest-details");
-        if (details) details.scrollIntoView({ behavior: "smooth", block: "start" });
-      }, 1000);
-      return () => clearTimeout(timer);
-    }
-  }, [initCheckIn, initCheckOut]);
-
   const nights = checkIn && checkOut
     ? Math.max(0, differenceInCalendarDays(new Date(checkOut), new Date(checkIn)))
     : 0;
   const totalGHS = nights * basePrice;
-  const totalPesewas = Math.round(totalGHS * 100); // Paystack uses smallest currency unit in strict integer
-
-  const minCheckIn = format(new Date(), "yyyy-MM-dd");
-  const minCheckOut = checkIn ? format(addDays(new Date(checkIn), 1), "yyyy-MM-dd") : minCheckIn;
+  const totalPesewas = Math.round(totalGHS * 100); 
 
   // Check availability against blocked_dates and existing bookings
   const checkAvailability = async (): Promise<boolean> => {
@@ -144,6 +111,36 @@ export default function Booking() {
     }
     return true;
   };
+
+  useEffect(() => {
+    async function fetchPricing() {
+      const { data } = await supabase.from('settings').select('*').eq('key', 'nightly_rate').single();
+      if (data && data.value) {
+        setBasePrice(Number(data.value));
+      }
+    }
+    fetchPricing();
+  }, []);
+
+  // Real-time availability check
+  useEffect(() => {
+    if (checkIn && checkOut && nights >= 1) {
+      checkAvailability();
+    } else {
+      setAvailabilityError("");
+    }
+  }, [checkIn, checkOut, nights]);
+
+  useEffect(() => {
+    // If arrived with dates pre-filled, scroll to details to save user a gesture
+    if (initCheckIn && initCheckOut && step === "details") {
+      const timer = setTimeout(() => {
+        const details = document.getElementById("guest-details");
+        if (details) details.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [initCheckIn, initCheckOut]);
 
   const validateForm = () => {
     const errs: Record<string, string> = {};
