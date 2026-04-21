@@ -76,14 +76,14 @@ export default function Booking() {
     ? Math.max(0, differenceInCalendarDays(new Date(checkOut), new Date(checkIn)))
     : 0;
   const totalGHS = nights * basePrice;
-  const totalPesewas = Math.round(totalGHS * 100); 
+  const totalPesewas = Math.round(totalGHS * 100);
 
   // Check availability against blocked_dates and existing bookings
   const checkAvailability = async (): Promise<boolean> => {
     if (!checkIn || !checkOut || nights < 1) return false;
-    
+
     setAvailabilityError("");
-    
+
     // 1. Generate list of dates guest will actually spend the night
     const checkInRange: string[] = [];
     const d = new Date(dateRange!.from!);
@@ -91,7 +91,7 @@ export default function Booking() {
       checkInRange.push(format(d, "yyyy-MM-dd"));
       d.setDate(d.getDate() + 1);
     }
-    
+
     console.log("Checking availability for nights:", checkInRange);
 
     const [blockedRes, existingRes] = await Promise.all([
@@ -211,7 +211,7 @@ export default function Booking() {
 
     setPaying(true);
     const available = await checkAvailability();
-    
+
     if (!available) {
       setPaying(false);
       return;
@@ -442,7 +442,7 @@ export default function Booking() {
                   <CalendarDays size={18} className="text-gold" />
                   Your Dates
                 </h2>
-                
+
                 <div className="grid sm:grid-cols-2 mb-6 border border-white/10 rounded-2xl overflow-hidden bg-white/[0.02]">
                   <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
                     <PopoverTrigger asChild>
@@ -458,17 +458,17 @@ export default function Booking() {
                       <AvailabilityCalendar
                         unavailableDates={unavailableDates}
                         selected={dateRange}
-                        onSelect={(range) => { 
-                          setDateRange(range); 
-                          setAvailabilityError(""); 
-                          setErrors(e => ({...e, checkIn: "", checkOut: "", dates: ""}));
+                        onSelect={(range) => {
+                          setDateRange(range);
+                          setAvailabilityError("");
+                          setErrors(e => ({ ...e, checkIn: "", checkOut: "", dates: "" }));
                           if (range?.from && range?.to) setCalendarOpen(false);
                         }}
                       />
                     </PopoverContent>
                   </Popover>
 
-                  <button 
+                  <button
                     className={`p-4 text-left hover:bg-white/[0.05] transition-colors ${errors.checkOut ? "bg-red-500/10" : ""}`}
                     onClick={() => setCalendarOpen(true)}
                   >
