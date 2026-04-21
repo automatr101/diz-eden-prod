@@ -71,19 +71,19 @@ export default function Navbar() {
         <div 
           className="absolute bottom-0 left-0 w-full h-[1px] bg-gradient-to-r from-gold via-gold/50 to-eden/0 opacity-60" 
         />
-        <div className="w-full flex items-center justify-between px-4 sm:px-8 py-2 lg:px-12">
+        <div className="w-full flex items-center justify-between px-4 sm:px-8 py-2 md:py-3 lg:px-12">
           {/* Logo */}
           <Link to="/" className="flex items-center group">
-            <div className="relative p-1 rounded-full border border-gold/30 group-hover:border-gold/60 transition-colors duration-500 bg-eden">
+            <div className="relative p-1 rounded-full border-2 border-gold shadow-[0_0_15px_rgba(212,175,55,0.3)] group-hover:shadow-[0_0_20px_rgba(212,175,55,0.5)] transition-all duration-500 bg-eden overflow-hidden">
               <img
                 src="/logo.png"
                 alt="Diz Eden"
-                className={`transition-all duration-500 object-cover rounded-full ${scrolled ? 'h-10 w-10' : 'h-14 w-14'}`}
+                className={`transition-all duration-500 object-cover rounded-full ${scrolled ? 'h-9 w-9' : 'h-11 w-11 sm:h-14 sm:w-14'}`}
                 style={{ objectPosition: 'center 35%', transform: 'scale(1.4)', transformOrigin: 'center 35%' }}
               />
             </div>
             {!scrolled && (
-              <span className="ml-3 font-display text-white text-lg tracking-[0.2em] uppercase opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+              <span className="ml-3 font-display text-white text-base sm:text-lg tracking-[0.2em] uppercase opacity-0 group-hover:opacity-100 transition-opacity duration-500 hidden sm:inline-block">
                 Diz Eden
               </span>
             )}
@@ -117,19 +117,19 @@ export default function Navbar() {
           </nav>
 
           {/* Book Now + Hamburger */}
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-2 sm:gap-6">
             <a
               href="/#booking-bar"
-              className="bg-gold px-8 py-3 rounded-full text-label-sm font-bold tracking-[0.15em] uppercase text-eden transition-all duration-500 hover:bg-white hover:scale-105 active:scale-95 shadow-[0_10px_20px_-10px_rgba(212,175,55,0.5)]"
+              className="bg-gold px-3.5 py-2 sm:px-8 sm:py-3 rounded-full text-[8.5px] sm:text-label-sm font-bold tracking-[0.12em] sm:tracking-[0.15em] uppercase text-eden transition-all duration-500 hover:bg-white hover:scale-105 active:scale-95 shadow-[0_10px_20px_-10px_rgba(212,175,55,0.5)]"
             >
               Book Now
             </a>
             <button
-              className="md:hidden text-cream p-2 hover:bg-white/10 rounded-full transition-colors"
+              className="md:hidden text-cream p-1.5 sm:p-2 hover:bg-white/10 rounded-full transition-colors"
               onClick={() => setMenuOpen(true)}
               aria-label="Open menu"
             >
-              <Menu size={26} />
+              <Menu size={18} className="sm:w-[26px] sm:h-[26px]" />
             </button>
           </div>
         </div>
@@ -183,7 +183,7 @@ export default function Navbar() {
               })}
               <a
                 href="/#booking-bar"
-                className="mt-12 bg-gold px-12 py-5 rounded-full text-label-lg font-bold tracking-widest text-eden transition-all hover:bg-white hover:scale-110"
+                className="mt-12 bg-gold px-10 py-4 rounded-full text-label-md font-bold tracking-widest text-eden transition-all hover:bg-white hover:scale-110"
                 onClick={() => setMenuOpen(false)}
               >
                 Book Now

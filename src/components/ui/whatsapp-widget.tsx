@@ -12,18 +12,17 @@ export default function WhatsAppWidget() {
       animate={{ scale: 1, opacity: 1 }}
       whileHover={{ scale: 1.1 }}
       whileTap={{ scale: 0.9 }}
-      className="fixed bottom-8 right-8 z-[100] group"
+      className="fixed bottom-6 right-6 sm:bottom-8 sm:right-8 z-[100] group"
       aria-label="Chat on WhatsApp"
     >
       <div className="relative">
         {/* Pulse effect */}
         <div className="absolute inset-0 rounded-full bg-[#25D366] animate-ping opacity-25" />
         
-        <div className="relative bg-[#25D366] text-white p-4 rounded-full shadow-[0_10px_30px_-5px_rgba(37,211,102,0.5)] border border-white/20 transition-all duration-300 group-hover:bg-[#128C7E] flex items-center justify-center">
+        <div className="relative bg-[#25D366] text-white p-3 sm:p-4 rounded-full shadow-[0_10px_30px_-5px_rgba(37,211,102,0.5)] border border-white/20 transition-all duration-300 group-hover:bg-[#128C7E] flex items-center justify-center">
           {/* Official WhatsApp Brand SVG */}
           <svg 
-            width="32" 
-            height="32" 
+            className="w-6 h-6 sm:w-8 sm:h-8"
             viewBox="0 0 24 24" 
             fill="currentColor"
           >

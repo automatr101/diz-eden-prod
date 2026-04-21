@@ -56,18 +56,18 @@ export default function BookingBar() {
       id="booking-bar"
       {...fadeInUp}
       transition={{ ...fadeInUp.transition, delay: 0.6 }}
-      className="relative z-20 px-4 md:px-8 mt-[-30px] md:mt-[-50px]"
+      className="relative z-20 px-4 md:px-8 mt-[-20px] sm:mt-[-50px]"
     >
-      <div className="mx-auto flex max-w-5xl flex-col gap-2 md:grid md:grid-cols-4 md:items-center bg-white/[0.04] backdrop-blur-xl border border-white/10 p-2 md:p-3 md:rounded-full rounded-3xl shadow-2xl shadow-black/50">
+      <div className="mx-auto flex max-w-5xl flex-col gap-1.5 md:grid md:grid-cols-4 md:items-center bg-white/[0.04] backdrop-blur-xl border border-white/10 p-1.5 md:p-3 md:rounded-full rounded-3xl shadow-2xl shadow-black/50">
 
         {/* Check-in */}
-        <div className="flex-1 bg-white/[0.02] hover:bg-white/[0.06] rounded-2xl md:rounded-full transition-colors px-6 py-4">
-          <span className="text-label-sm text-gold font-bold tracking-widest uppercase mb-2 block">Check-in</span>
+        <div className="flex-1 bg-white/[0.02] hover:bg-white/[0.06] rounded-2xl md:rounded-full transition-colors px-3 py-2.5 sm:px-6 sm:py-4">
+          <span className="text-[9px] sm:text-label-sm text-gold font-bold tracking-widest uppercase mb-0.5 sm:mb-2 block">Check-in</span>
           <Popover>
             <PopoverTrigger asChild>
-              <button className="flex items-center gap-3 w-full text-left outline-none group">
-                <CalendarDays size={18} className="text-gold group-hover:scale-110 transition-transform" />
-                <span className={cn("font-display text-xl transition-colors", checkIn ? "text-white" : "text-cream/40")}>
+              <button className="flex items-center gap-2.5 w-full text-left outline-none group">
+                <CalendarDays size={14} className="text-gold group-hover:scale-110 transition-transform" />
+                <span className={cn("font-display text-base sm:text-xl transition-colors", checkIn ? "text-white" : "text-cream/40")}>
                   {checkIn ? format(checkIn, "dd MMM yyyy") : "Select date"}
                 </span>
               </button>
@@ -86,13 +86,13 @@ export default function BookingBar() {
         </div>
 
         {/* Check-out */}
-        <div className="flex-1 bg-white/[0.02] hover:bg-white/[0.06] rounded-2xl md:rounded-full transition-colors px-6 py-4">
-          <span className="text-label-sm text-gold font-bold tracking-widest uppercase mb-2 block">Check-out</span>
+        <div className="flex-1 bg-white/[0.02] hover:bg-white/[0.06] rounded-2xl md:rounded-full transition-colors px-3 py-2.5 sm:px-6 sm:py-4">
+          <span className="text-[9px] sm:text-label-sm text-gold font-bold tracking-widest uppercase mb-0.5 sm:mb-2 block">Check-out</span>
           <Popover>
             <PopoverTrigger asChild>
-              <button className="flex items-center gap-3 w-full text-left outline-none group">
-                <CalendarDays size={18} className="text-gold group-hover:scale-110 transition-transform" />
-                <span className={cn("font-display text-xl transition-colors", checkOut ? "text-white" : "text-cream/40")}>
+              <button className="flex items-center gap-2.5 w-full text-left outline-none group">
+                <CalendarDays size={14} className="text-gold group-hover:scale-110 transition-transform" />
+                <span className={cn("font-display text-base sm:text-xl transition-colors", checkOut ? "text-white" : "text-cream/40")}>
                   {checkOut ? format(checkOut, "dd MMM yyyy") : "Select date"}
                 </span>
               </button>
@@ -111,12 +111,12 @@ export default function BookingBar() {
         </div>
 
         {/* Guests */}
-        <div className="flex-1 bg-white/[0.02] hover:bg-white/[0.06] rounded-2xl md:rounded-full transition-colors px-6 py-4">
-          <span className="text-label-sm text-gold font-bold tracking-widest uppercase mb-2 block">Guests</span>
+        <div className="flex-1 bg-white/[0.02] hover:bg-white/[0.06] rounded-2xl md:rounded-full transition-colors px-3 py-2.5 sm:px-6 sm:py-4">
+          <span className="text-[9px] sm:text-label-sm text-gold font-bold tracking-widest uppercase mb-0.5 sm:mb-2 block">Guests</span>
           <Select value={guests} onValueChange={setGuests}>
-            <SelectTrigger className="bg-transparent border-none p-0 h-auto text-xl font-display text-white focus:ring-0 shadow-none ring-0 w-full flex items-center gap-3">
-              <div className="flex items-center gap-3">
-                <Users size={18} className="text-gold group-hover:scale-110 transition-transform" />
+            <SelectTrigger className="bg-transparent border-none p-0 h-auto text-base sm:text-xl font-display text-white focus:ring-0 shadow-none ring-0 w-full flex items-center gap-2.5">
+              <div className="flex items-center gap-2.5">
+                <Users size={14} className="text-gold group-hover:scale-110 transition-transform" />
                 <SelectValue placeholder="Guests" />
               </div>
             </SelectTrigger>
@@ -129,15 +129,15 @@ export default function BookingBar() {
         </div>
 
         {/* CTA */}
-        <div className="flex items-center pt-2 md:pt-0">
+        <div className="flex items-center pt-1 md:pt-0">
           <button
             onClick={handleCheckAvailability}
             disabled={!checkIn || !checkOut || loading}
-            className={`w-full h-full min-h-[64px] bg-gold text-eden text-label-sm font-bold tracking-[0.2em] uppercase transition-all duration-500 rounded-2xl md:rounded-full flex items-center justify-center ${
+            className={`w-full h-full min-h-[44px] sm:min-h-[64px] bg-gold text-eden text-[8.5px] sm:text-label-sm font-bold tracking-[0.2em] sm:tracking-[0.25em] uppercase transition-all duration-500 rounded-xl sm:rounded-full flex items-center justify-center ${
               (!checkIn || !checkOut || loading) ? "opacity-50 cursor-not-allowed" : "hover:bg-white hover:scale-[1.02] active:scale-95 shadow-[0_10px_20px_rgba(212,175,55,0.3)] hover:shadow-[0_15px_30px_rgba(255,255,255,0.4)]"
             }`}
           >
-            {loading ? "Processing…" : "Search"}
+            {loading ? "Processing…" : "Search Availability"}
           </button>
         </div>
       </div>

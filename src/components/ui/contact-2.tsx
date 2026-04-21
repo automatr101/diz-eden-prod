@@ -83,7 +83,7 @@ export const Contact2 = ({
   };
 
   return (
-    <section id="contact" className="py-32 bg-eden border-t border-white/10 overflow-hidden">
+    <section id="contact" className="py-16 sm:py-32 bg-eden border-t border-white/10 overflow-hidden">
       <div className="container mx-auto px-6">
         <div className="mx-auto flex max-w-screen-xl flex-col justify-between gap-10 lg:flex-row lg:gap-20">
           <motion.div 
@@ -91,32 +91,32 @@ export const Contact2 = ({
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.8, ease: "easeOut" }}
-            className="mx-auto flex max-w-sm flex-col justify-between gap-10"
+            className="mx-auto flex max-w-sm flex-col justify-between gap-8 sm:gap-10"
           >
             <div className="text-center lg:text-left">
-              <h2 className="mb-2 text-5xl font-display font-light text-gold lg:mb-1 lg:text-7xl">
+              <h2 className="mb-2 text-4xl sm:text-5xl font-display font-light text-gold lg:mb-1 lg:text-7xl">
                 {title}
               </h2>
-              <p className="text-cream mt-6 leading-relaxed text-lg">{description}</p>
+              <p className="text-cream mt-4 sm:mt-6 leading-relaxed text-base sm:text-lg">{description}</p>
             </div>
             <div className="mx-auto w-fit lg:mx-0">
-              <h3 className="mb-6 text-center text-2xl font-display text-gold lg:text-left">
+              <h3 className="mb-4 sm:mb-6 text-center text-xl sm:text-2xl font-display text-gold lg:text-left">
                 Contact Details
               </h3>
-              <ul className="space-y-4 text-cream">
-                <li className="flex items-center gap-3">
-                  <span className="font-bold text-white">Phone / WhatsApp: </span>
+              <ul className="space-y-3 sm:space-y-4 text-cream">
+                <li className="flex items-center gap-3 text-sm sm:text-base">
+                  <span className="font-bold text-white">Phone: </span>
                   <a href="https://wa.link/aboffc" target="_blank" rel="noopener noreferrer" className="hover:text-gold transition-colors">
                     {phone}
                   </a>
                 </li>
-                <li className="flex items-center gap-3">
+                <li className="flex items-center gap-3 text-sm sm:text-base">
                   <span className="font-bold text-white">Instagram: </span>
                   <a href="https://www.instagram.com/diz.eden/" target="_blank" rel="noopener noreferrer" className="hover:text-gold transition-colors underline decoration-gold/30">
                     @diz.eden
                   </a>
                 </li>
-                <li className="flex items-center gap-3">
+                <li className="flex items-center gap-3 text-sm sm:text-base">
                   <span className="font-bold text-white">Web: </span>
                   <a href={web.url} target="_blank" className="underline decoration-gold/50 hover:text-gold transition-colors">
                     {web.label}
@@ -132,15 +132,15 @@ export const Contact2 = ({
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
             onSubmit={handleSubmit}
-            className="mx-auto flex w-full max-w-screen-md flex-col gap-6 rounded-[2rem] border border-white/10 bg-white/5 p-8 lg:p-12 shadow-2xl backdrop-blur-md"
+            className="mx-auto flex w-full max-w-screen-md flex-col gap-6 rounded-[1.5rem] sm:rounded-[2rem] border border-white/10 bg-white/5 p-6 sm:p-10 lg:p-12 shadow-2xl backdrop-blur-md"
           >
             {sent ? (
-              <div className="flex flex-col items-center justify-center py-12 gap-4 text-center">
-                <div className="w-16 h-16 rounded-full bg-green-500/20 border border-green-500/30 flex items-center justify-center">
-                  <CheckCircle2 size={32} className="text-green-400" />
+              <div className="flex flex-col items-center justify-center py-8 sm:py-12 gap-4 text-center">
+                <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-green-500/20 border border-green-500/30 flex items-center justify-center">
+                  <CheckCircle2 size={24} className="text-green-400" />
                 </div>
-                <h3 className="text-white text-2xl font-display font-light">Message Sent!</h3>
-                <p className="text-cream/60">
+                <h3 className="text-white text-xl sm:text-2xl font-display font-light">Message Sent!</h3>
+                <p className="text-cream/60 text-sm sm:text-base">
                   We've received your message and will get back to you on WhatsApp shortly.
                 </p>
                 <button
@@ -183,7 +183,7 @@ export const Contact2 = ({
                 <Button
                   type="submit"
                   disabled={loading}
-                  className="w-full bg-gold hover:bg-white text-eden font-bold py-8 rounded-full text-xl transition-all duration-500 shadow-lg shadow-gold/20 uppercase tracking-[0.2em] flex items-center justify-center gap-3"
+                  className="w-full bg-gold hover:bg-white text-eden font-bold py-6 sm:py-8 rounded-full text-lg sm:text-xl transition-all duration-500 shadow-lg shadow-gold/20 uppercase tracking-[0.2em] flex items-center justify-center gap-3"
                 >
                   {loading ? (
                     <><Loader2 size={20} className="animate-spin" /> Sending...</>

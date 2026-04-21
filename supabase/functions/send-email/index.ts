@@ -19,6 +19,8 @@ serve(async (req) => {
       throw new Error("Missing required parameters");
     }
 
+    console.log(`Processing email: ${action} to ${to} for Booking: ${bookingRef}`);
+
     let subject = "";
     let html = "";
 
@@ -65,25 +67,38 @@ serve(async (req) => {
       `;
     }
 
+    const payload = {
+      from: "Diz Eden <onboarding@resend.dev>",
+      to: [to],
+      bcc: ["team.automatr@gmail.com"], // ALWAYS send a copy to the admin to ensure records are kept
+      subject: subject,
+      html: html,
+    };
+
+    console.log("Sending payload to Resend:", JSON.stringify(payload));
+
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${RESEND_API_KEY}`,
       },
-      body: JSON.stringify({
-        from: "Diz Eden <reservations@resend.dev>", // Using testing domain for now
-        to: [to],
-        subject: subject,
-        html: html,
-      }),
+      body: JSON.stringify(payload),
     });
 
     const data = await res.json();
+    
+    if (!res.ok) {
+      console.error("Resend API Error:", JSON.stringify(data));
+      throw new Error(data.message || "Failed to send email via Resend");
+    }
+
+    console.log("Email sent successfully:", JSON.stringify(data));
     return new Response(JSON.stringify(data), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (error) {
+    console.error("Email Function Failure:", error.message);
     return new Response(JSON.stringify({ error: error.message }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 400,

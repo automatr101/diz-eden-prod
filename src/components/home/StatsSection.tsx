@@ -30,7 +30,7 @@ function Counter({ target, suffix }: { target: number; suffix: string }) {
   }, [inView, target]);
 
   return (
-    <span ref={ref} className="text-display-2xl text-cream md:text-[5rem]">
+    <span ref={ref} className="text-display-xl text-cream md:text-[5rem]">
       {count}{suffix}
     </span>
   );
@@ -38,10 +38,10 @@ function Counter({ target, suffix }: { target: number; suffix: string }) {
 
 export default function StatsSection() {
   return (
-    <section className="bg-eden py-24 px-6 lg:py-32 lg:px-16 relative">
+    <section className="bg-eden py-16 px-6 sm:py-24 lg:py-32 lg:px-16 relative">
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[90%] h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
       
-      <div className="mx-auto grid max-w-7xl grid-cols-2 gap-8 lg:grid-cols-4">
+      <div className="mx-auto grid max-w-7xl grid-cols-2 gap-4 sm:gap-8 lg:grid-cols-4">
         {stats.map((s) => (
           <motion.div
             key={s.label}
@@ -51,12 +51,12 @@ export default function StatsSection() {
             transition={{ duration: 0.6 }}
             className="group relative"
           >
-            <div className="bg-white/[0.03] backdrop-blur-md rounded-[2.5rem] border border-white/10 p-10 flex flex-col items-center justify-center transition-all duration-500 group-hover:bg-white/[0.06] group-hover:-translate-y-2 group-hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.5)]">
+            <div className="bg-white/[0.03] backdrop-blur-md rounded-[1.5rem] sm:rounded-[2.5rem] border border-white/10 p-6 sm:p-10 flex flex-col items-center justify-center transition-all duration-500 group-hover:bg-white/[0.06] group-hover:-translate-y-2 group-hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.5)]">
               <div className="relative">
                 <Counter target={s.value} suffix={s.suffix} />
                 <div className="absolute -inset-4 bg-gold/10 blur-2xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
               </div>
-              <p className="mt-6 text-label-sm text-gold font-bold tracking-[0.2em] uppercase text-center">{s.label}</p>
+              <p className="mt-4 sm:mt-6 text-[10px] sm:text-label-sm text-gold font-bold tracking-[0.2em] uppercase text-center">{s.label}</p>
             </div>
           </motion.div>
         ))}

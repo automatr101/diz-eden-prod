@@ -140,7 +140,7 @@ export default function PropertyDetail() {
           </div>
           <button 
             onClick={() => window.scrollTo({ top: document.getElementById('booking-widget')?.offsetTop || 0, behavior: 'smooth' })}
-            className="bg-gold px-8 py-3.5 rounded-lg text-label-lg font-bold uppercase tracking-widest text-eden hover:bg-white transition-colors active:scale-95 shadow-lg shadow-gold/20"
+            className="bg-gold px-6 py-2.5 rounded-full text-label-sm font-bold uppercase tracking-widest text-eden hover:bg-white transition-colors active:scale-95 shadow-lg shadow-gold/20"
           >
             Reserve
           </button>

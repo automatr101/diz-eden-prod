@@ -82,6 +82,26 @@ export default function Booking() {
     fetchPricing();
   }, []);
 
+  // Real-time availability check
+  useEffect(() => {
+    if (checkIn && checkOut && nights >= 1) {
+      checkAvailability();
+    } else {
+      setAvailabilityError("");
+    }
+  }, [checkIn, checkOut, nights]);
+
+  useEffect(() => {
+    // If arrived with dates pre-filled, scroll to details to save user a gesture
+    if (initCheckIn && initCheckOut && step === "details") {
+      const timer = setTimeout(() => {
+        const details = document.getElementById("guest-details");
+        if (details) details.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [initCheckIn, initCheckOut]);
+
   const nights = checkIn && checkOut
     ? Math.max(0, differenceInCalendarDays(new Date(checkOut), new Date(checkIn)))
     : 0;
@@ -138,7 +158,16 @@ export default function Booking() {
   };
 
   const handleProceedToPayment = async () => {
-    if (!validateForm()) return;
+    if (!validateForm()) {
+      // Find the first error element and scroll to it
+      const firstError = document.querySelector(".border-red-500, .bg-red-500\\/10");
+      if (firstError) {
+        firstError.scrollIntoView({ behavior: "smooth", block: "center" });
+      } else {
+        window.scrollTo({ top: 150, behavior: "smooth" });
+      }
+      return;
+    }
 
     // ── SECURITY: Rate limit check ──
     const now = Date.now();
@@ -363,7 +392,7 @@ export default function Booking() {
             </p>
             <a
               href="/"
-              className="inline-block bg-gold text-eden font-bold text-xs uppercase tracking-widest px-10 py-4 rounded-full hover:bg-white transition-all"
+              className="inline-block bg-gold text-eden font-bold text-[10px] sm:text-xs uppercase tracking-widest px-8 py-3 sm:px-10 sm:py-4 rounded-full hover:bg-white transition-all shadow-lg shadow-gold/20"
             >
               Back to Diz Eden
             </a>
@@ -470,7 +499,7 @@ export default function Booking() {
               </div>
 
               {/* Guest Details */}
-              <div className="bg-white/[0.03] border border-white/5 rounded-3xl p-7">
+              <div id="guest-details" className="bg-white/[0.03] border border-white/5 rounded-3xl p-7 scroll-mt-24">
                 <h2 className="text-white font-semibold mb-5 flex items-center gap-2">
                   <Users size={18} className="text-gold" />
                   Your Details
@@ -559,11 +588,11 @@ export default function Booking() {
 
                 <button
                   onClick={handleProceedToPayment}
-                  disabled={paying || nights < 1}
-                  className="w-full bg-gold text-eden font-bold text-xs uppercase tracking-[0.2em] py-5 rounded-2xl hover:bg-white transition-all duration-300 disabled:opacity-40 flex items-center justify-center gap-2 shadow-[0_15px_30px_-10px_rgba(212,175,55,0.5)]"
+                  disabled={paying || nights < 1 || !!availabilityError}
+                  className="w-full bg-gold text-eden font-bold text-[10px] sm:text-xs uppercase tracking-[0.2em] py-4 sm:py-5 rounded-2xl hover:bg-white transition-all duration-300 disabled:opacity-40 flex items-center justify-center gap-2 shadow-[0_15px_30px_-10px_rgba(212,175,55,0.5)]"
                 >
                   {paying ? (
-                    <><Loader2 size={16} className="animate-spin" /> Checking availability...</>
+                    <><Loader2 size={14} className="animate-spin" /> Checking...</>
                   ) : (
                     <>Pay GH₵{totalGHS.toLocaleString() || "—"} Securely</>
                   )}

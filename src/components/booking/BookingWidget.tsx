@@ -128,7 +128,7 @@ export default function BookingWidget({ property }: BookingWidgetProps) {
       <button
         onClick={handleReserve}
         disabled={!dateRange?.from || !dateRange?.to}
-        className="mt-4 w-full bg-gold py-4 text-label-lg font-semibold tracking-widest text-eden transition-all duration-300 hover:bg-gold-dark active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed"
+        className="mt-4 w-full bg-gold py-3 text-label-sm font-semibold tracking-[0.2em] text-eden transition-all duration-300 hover:bg-gold-dark active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed sm:py-4 sm:text-label-lg"
       >
         {price ? "Reserve" : "Check Availability"}
       </button>

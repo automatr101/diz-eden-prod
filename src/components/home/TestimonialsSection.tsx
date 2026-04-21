@@ -100,17 +100,17 @@ export default function TestimonialsSection() {
           <div className="absolute top-1/2 -translate-y-1/2 left-0 right-0 flex justify-between pointer-events-none">
             <button 
               onClick={prev}
-              className="p-4 rounded-full border border-white/10 text-white/40 hover:text-gold hover:border-gold transition-all pointer-events-auto bg-eden/50 backdrop-blur-sm -ml-4 md:ml-0"
+              className="p-2.5 md:p-4 rounded-full border border-white/10 text-white/40 hover:text-gold hover:border-gold transition-all pointer-events-auto bg-eden/50 backdrop-blur-sm -ml-2 md:ml-0"
               aria-label="Previous testimonial"
             >
-              <ChevronLeft size={24} />
+              <ChevronLeft className="w-5 h-5 md:w-6 md:h-6" />
             </button>
             <button 
               onClick={next}
-              className="p-4 rounded-full border border-white/10 text-white/40 hover:text-gold hover:border-gold transition-all pointer-events-auto bg-eden/50 backdrop-blur-sm -mr-4 md:mr-0"
+              className="p-2.5 md:p-4 rounded-full border border-white/10 text-white/40 hover:text-gold hover:border-gold transition-all pointer-events-auto bg-eden/50 backdrop-blur-sm -mr-2 md:mr-0"
               aria-label="Next testimonial"
             >
-              <ChevronRight size={24} />
+              <ChevronRight className="w-5 h-5 md:w-6 md:h-6" />
             </button>
           </div>
         </div>

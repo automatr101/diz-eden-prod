@@ -49,14 +49,14 @@ export default function MosaicSlideshow() {
   }, [gridImages]);
 
   return (
-    <section className="bg-eden py-24 overflow-hidden border-t border-white/5">
-      <div className="mx-auto max-w-7xl px-6 lg:px-16 mb-16 text-center">
+    <section className="bg-eden py-16 sm:py-24 overflow-hidden border-t border-white/5">
+      <div className="mx-auto max-w-7xl px-6 lg:px-16 mb-10 sm:mb-16 text-center">
         <motion.h2 
           variants={fadeInUp}
           initial="initial"
           whileInView="animate"
           viewport={viewportOnce}
-          className="text-display-lg text-white mb-6"
+          className="text-display-md sm:text-display-lg text-white mb-4 sm:mb-6"
         >
           Living <span className="text-gold italic">Mosaic</span>
         </motion.h2>
@@ -65,14 +65,14 @@ export default function MosaicSlideshow() {
           initial="initial"
           whileInView="animate"
           viewport={viewportOnce}
-          className="text-cream max-w-2xl mx-auto text-lg leading-relaxed font-light"
+          className="text-cream/80 max-w-2xl mx-auto text-base sm:text-lg leading-relaxed font-light"
         >
-          Watch the artistry of Diz Eden unfold in this dynamic, ever-changing 4x4 visual narrative.
+          Watch the artistry of Diz Eden unfold in this dynamic, ever-changing visual narrative.
         </motion.p>
       </div>
 
-      <div className="mx-auto max-w-6xl px-6">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4 aspect-square">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-1.5 sm:gap-4 aspect-square">
           {gridImages.map((img, idx) => (
             <div key={idx} className="relative overflow-hidden group bg-eden">
               <AnimatePresence mode="popLayout">

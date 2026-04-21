@@ -83,13 +83,13 @@ const AnimatedTabs = ({ className }: AnimatedTabsProps) => {
   return (
     <div className={cn("w-full flex flex-col gap-y-6", className)}>
       {/* Tab Switcher */}
-      <div className="flex gap-2 flex-wrap bg-white/5 backdrop-blur-md p-1.5 rounded-2xl w-fit mx-auto border border-white/10">
+      <div className="grid grid-cols-2 bg-white/5 backdrop-blur-md p-1.5 rounded-2xl w-full max-w-sm mx-auto border border-white/10">
         {STAYS.map((stay) => (
           <button
             key={stay.id}
             onClick={() => handleTabChange(stay.id)}
             className={cn(
-              "relative px-8 py-3 text-xs font-bold uppercase tracking-[0.2em] rounded-xl outline-none transition-all duration-300",
+              "relative px-4 py-2.5 sm:px-8 sm:py-3 text-[10px] sm:text-xs font-bold uppercase tracking-[0.1em] sm:tracking-[0.2em] rounded-xl outline-none transition-all duration-300",
               activeTab === stay.id ? "text-eden" : "text-white/50 hover:text-white"
             )}
           >
@@ -171,14 +171,14 @@ const AnimatedTabs = ({ className }: AnimatedTabsProps) => {
                     {stay.description}
                   </p>
 
-                  <div className="flex flex-wrap gap-4 pt-4 border-t border-white/5">
+                  <div className="flex flex-row flex-wrap justify-center md:justify-start gap-2.5 sm:gap-4 pt-4 border-t border-white/5">
                     {stay.chips.map(({ Icon, label }) => (
                       <div
                         key={label}
-                        className={cn("flex items-center gap-3 px-4 py-2 rounded-xl border", stay.chipStyle)}
+                        className={cn("flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl border whitespace-nowrap", stay.chipStyle)}
                       >
-                        <Icon size={18} className="text-gold" />
-                        <span className="text-xs text-cream uppercase tracking-widest font-bold">
+                        <Icon size={14} className="text-gold sm:w-[18px] sm:h-[18px]" />
+                        <span className="text-[10px] sm:text-xs text-cream uppercase tracking-widest font-bold">
                           {label}
                         </span>
                       </div>
@@ -186,12 +186,14 @@ const AnimatedTabs = ({ className }: AnimatedTabsProps) => {
                   </div>
 
                   {/* Book Now CTA */}
-                  <a
-                    href={`/booking?guests=${stay.id === "2br" ? 2 : 1}`}
-                    className="mt-2 inline-flex items-center gap-3 bg-gold text-eden font-bold text-xs uppercase tracking-[0.2em] px-8 py-4 rounded-full w-fit hover:bg-white transition-all duration-300 hover:scale-105 shadow-[0_10px_20px_-5px_rgba(212,175,55,0.4)]"
-                  >
-                    Book This Stay
-                  </a>
+                  <div className="flex justify-center md:justify-start">
+                    <a
+                      href={`/booking?guests=${stay.id === "2br" ? 2 : 1}`}
+                      className="mt-2 inline-flex items-center gap-3 bg-gold text-eden font-bold text-[10px] sm:text-xs uppercase tracking-[0.2em] px-8 py-3.5 sm:py-4 rounded-full w-full sm:w-fit justify-center hover:bg-white transition-all duration-300 hover:scale-105 shadow-[0_10px_20px_-5px_rgba(212,175,55,0.4)]"
+                    >
+                      Book This Stay
+                    </a>
+                  </div>
                 </div>
               </motion.div>
             ))
