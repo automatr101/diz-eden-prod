@@ -82,6 +82,8 @@ export default function Booking() {
   const checkAvailability = async (): Promise<boolean> => {
     if (!checkIn || !checkOut || nights < 1) return false;
     
+    setAvailabilityError("");
+    
     // 1. Generate list of dates guest will actually spend the night
     const checkInRange: string[] = [];
     const d = new Date(dateRange!.from!);
@@ -89,6 +91,8 @@ export default function Booking() {
       checkInRange.push(format(d, "yyyy-MM-dd"));
       d.setDate(d.getDate() + 1);
     }
+    
+    console.log("Checking availability for nights:", checkInRange);
 
     const [blockedRes, existingRes] = await Promise.all([
       supabase.from("blocked_dates").select("date").in("date", checkInRange),
@@ -100,7 +104,7 @@ export default function Booking() {
     ]);
 
     if (blockedRes.error || existingRes.error) {
-      console.error("Availability check failed:", blockedRes.error || existingRes.error);
+      console.error("Availability query failed:", blockedRes.error || existingRes.error);
       return false;
     }
 
@@ -108,14 +112,17 @@ export default function Booking() {
     const isBooked = existingRes.data && existingRes.data.length > 0;
 
     if (isBlocked) {
+      console.log("Found blocked dates:", blockedRes.data);
       setAvailabilityError("Some dates in your selection are blocked. Please choose different dates.");
       return false;
     }
     if (isBooked) {
+      console.log("Found overlapping bookings:", existingRes.data);
       setAvailabilityError("These dates overlap with an existing booking. Please choose different dates.");
       return false;
     }
 
+    console.log("Dates are available!");
     setAvailabilityError("");
     return true;
   };
@@ -132,10 +139,9 @@ export default function Booking() {
 
   // Real-time availability check
   useEffect(() => {
+    setAvailabilityError(""); // Reset error immediately when dates change
     if (checkIn && checkOut && nights >= 1) {
       checkAvailability();
-    } else {
-      setAvailabilityError("");
     }
   }, [checkIn, checkOut, nights]);
 
@@ -412,7 +418,7 @@ export default function Booking() {
   return (
     <>
       <Navbar />
-      <main className="min-h-screen bg-eden pt-36 pb-20 px-6 lg:px-16">
+      <main className="min-h-screen bg-eden pt-48 pb-20 px-6 lg:px-16">
         <div className="mx-auto max-w-6xl">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
