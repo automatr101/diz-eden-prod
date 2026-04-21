@@ -223,7 +223,10 @@ export default function Booking() {
   };
 
   const launchPaystack = (paystackKey: string) => {
+    console.log("Launching Paystack with key:", paystackKey.substring(0, 8) + "...");
+    
     if (!window.PaystackPop) {
+      console.error("PaystackPop is not available on terminal window.");
       alert("Payment system not loaded. Please disable your adblocker, refresh and try again.");
       setStep("details");
       setPaying(false);
@@ -231,8 +234,10 @@ export default function Booking() {
     }
 
     const ref = `DE-${Date.now().toString(36).toUpperCase()}`;
+    console.log("Generated transaction ref:", ref);
 
     try {
+      console.log("Setting up PaystackPop...");
       const handler = window.PaystackPop.setup({
         key: paystackKey,
         email: form.email,
@@ -249,17 +254,20 @@ export default function Booking() {
           ],
         },
         onClose: function() {
+          console.log("Paystack modal closed by user.");
           setStep("details");
           setPaying(false);
           tg.paymentFailed({ guestName: form.name, ref }).catch(console.error);
         },
         callback: function(response: any) {
+          console.log("Paystack payment successful!", response);
           if (response.status === "success" || response.reference) {
             handlePaymentSuccess(response.reference, ref).catch(console.error);
           }
         },
       });
 
+      console.log("Opening Paystack iframe...");
       tg.bookingStarted({ guestName: form.name, total: totalPesewas / 100, ref }).catch(console.error);
       handler.openIframe();
     } catch (err: any) {
