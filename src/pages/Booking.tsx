@@ -81,10 +81,17 @@ export default function Booking() {
   // Check availability against blocked_dates and existing bookings
   const checkAvailability = async (): Promise<boolean> => {
     if (!checkIn || !checkOut || nights < 1) return false;
-    setAvailabilityError("");
+    
+    // 1. Generate list of dates guest will actually spend the night
+    const checkInRange: string[] = [];
+    const d = new Date(dateRange!.from!);
+    for (let i = 0; i < nights; i++) {
+      checkInRange.push(format(d, "yyyy-MM-dd"));
+      d.setDate(d.getDate() + 1);
+    }
 
     const [blockedRes, existingRes] = await Promise.all([
-      supabase.from("blocked_dates").select("date").gte("date", checkIn).lte("date", checkOut),
+      supabase.from("blocked_dates").select("date").in("date", checkInRange),
       supabase.from("bookings")
         .select("check_in, check_out")
         .neq("status", "cancelled")
@@ -94,21 +101,22 @@ export default function Booking() {
 
     if (blockedRes.error || existingRes.error) {
       console.error("Availability check failed:", blockedRes.error || existingRes.error);
-      setAvailabilityError("Database connection error. Please ensure your Supabase tables are set up correctly.");
       return false;
     }
 
-    const { data: blocked } = blockedRes;
-    const { data: existing } = existingRes;
+    const isBlocked = blockedRes.data && blockedRes.data.length > 0;
+    const isBooked = existingRes.data && existingRes.data.length > 0;
 
-    if (blocked && blocked.length > 0) {
+    if (isBlocked) {
       setAvailabilityError("Some dates in your selection are blocked. Please choose different dates.");
       return false;
     }
-    if (existing && existing.length > 0) {
+    if (isBooked) {
       setAvailabilityError("These dates overlap with an existing booking. Please choose different dates.");
       return false;
     }
+
+    setAvailabilityError("");
     return true;
   };
 
@@ -404,7 +412,7 @@ export default function Booking() {
   return (
     <>
       <Navbar />
-      <main className="min-h-screen bg-eden pt-28 pb-20 px-6 lg:px-16">
+      <main className="min-h-screen bg-eden pt-36 pb-20 px-6 lg:px-16">
         <div className="mx-auto max-w-6xl">
           <motion.div
             initial={{ opacity: 0, y: 20 }}

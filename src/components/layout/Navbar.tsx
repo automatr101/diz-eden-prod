@@ -63,7 +63,7 @@ export default function Navbar() {
     <>
       <header
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-          scrolled
+          (scrolled || location.pathname !== "/")
             ? "bg-eden/95 backdrop-blur-md shadow-xl"
             : "bg-gradient-to-b from-black/80 via-black/40 to-transparent py-4"
         } rounded-t-[2rem] mx-2 mt-2`}
