@@ -67,6 +67,7 @@ export default function Booking() {
   const [form, setForm] = useState({ name: "", email: "", phone: "", notes: "" });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [paying, setPaying] = useState(false);
+  const [redirecting, setRedirecting] = useState(false);
   const [bookingRef, setBookingRef] = useState("");
   const [availabilityError, setAvailabilityError] = useState("");
 
@@ -218,52 +219,77 @@ export default function Booking() {
     }
 
     setStep("payment");
-    // Small delay then launch Paystack
-    setTimeout(() => launchPaystack(paystackKey), 300);
+    await launchPaystackRedirect(paystackKey);
   };
 
-  const launchPaystack = (paystackKey: string) => {
-    if (!window.PaystackPop) {
-      alert("Payment system not loaded. Please disable your adblocker and refresh.");
-      setPaying(false);
-      return;
-    }
-
+  const launchPaystackRedirect = async (paystackKey: string) => {
     const ref = `DE-${Date.now().toString(36).toUpperCase()}`;
-
+    
     try {
-      const handler = window.PaystackPop.setup({
-        key: paystackKey,
-        email: form.email,
-        amount: totalPesewas,
-        currency: "GHS",
-        ref: ref,
-        metadata: {
-          custom_fields: [
-            { display_name: "Guest Name", variable_name: "guest_name", value: form.name },
-            { display_name: "Phone", variable_name: "phone", value: form.phone },
-            { display_name: "Property", variable_name: "property", value: apartment.name },
-            { display_name: "Check-in", variable_name: "check_in", value: checkIn },
-            { display_name: "Check-out", variable_name: "check_out", value: checkOut },
-          ],
-        },
-        callback: (response: any) => {
-          handlePaymentSuccess(response.reference, ref).catch(console.error);
-        },
-        onClose: () => {
-          setPaying(false);
-          setStep("details");
+      console.log("Initializing secure payment session...");
+      const { data, error } = await supabase.functions.invoke("create-payment", {
+        body: {
+          email: form.email,
+          amount: totalPesewas,
+          reference: ref,
+          metadata: {
+            custom_fields: [
+              { display_name: "Guest Name", variable_name: "guest_name", value: form.name },
+              { display_name: "Phone", variable_name: "phone", value: form.phone },
+              { display_name: "Property", variable_name: "property", value: apartment.name },
+              { display_name: "Check-in", variable_name: "check_in", value: checkIn },
+              { display_name: "Check-out", variable_name: "check_out", value: checkOut },
+            ],
+          },
         },
       });
 
-      handler.openIframe();
+      if (error || !data?.status) {
+        throw new Error(error?.message || data?.error || data?.message || "Could not initialize payment session.");
+      }
+
+      console.log("Redirecting to Paystack:", data.data.authorization_url);
+      setRedirecting(true);
+      
       tg.bookingStarted({ guestName: form.name, total: totalPesewas / 100, ref }).catch(console.error);
+      
+      // Save temporary booking for the callback to find
+      localStorage.setItem("pending_booking", JSON.stringify({
+        form, checkIn, checkOut, guests, nights, basePrice, totalGHS, ref
+      }));
+
+      window.location.href = data.data.authorization_url;
     } catch (err: any) {
-      console.error("Paystack Error:", err);
-      alert("Payment window failed to open. Please try again.");
+      console.error("Payment Error:", err);
+      alert("Payment initialization failed: " + err.message);
       setPaying(false);
+      setRedirecting(false);
     }
   };
+
+  const handleCallback = async (ref: string) => {
+    setPaying(true);
+    setRedirecting(true);
+    const saved = localStorage.getItem("pending_booking");
+    if (saved) {
+      const b = JSON.parse(saved);
+      setForm(b.form);
+      await handlePaymentSuccess(ref, b.ref);
+      localStorage.removeItem("pending_booking");
+    } else {
+      setStep("details");
+      setPaying(false);
+      setRedirecting(false);
+    }
+  };
+
+  useEffect(() => {
+    const trxRef = params.get("trxref") || params.get("reference");
+    const status = params.get("status");
+    if (trxRef) {
+      handleCallback(trxRef);
+    }
+  }, [params]);
 
   const handlePaymentSuccess = async (paystackRef: string, internalRef: string) => {
     setPaying(true);
@@ -598,7 +624,7 @@ export default function Booking() {
                   className="w-full bg-gold text-eden font-bold text-[10px] sm:text-xs uppercase tracking-[0.2em] py-4 sm:py-5 rounded-2xl hover:bg-white transition-all duration-300 disabled:opacity-40 flex items-center justify-center gap-2 shadow-[0_15px_30px_-10px_rgba(212,175,55,0.5)]"
                 >
                   {paying ? (
-                    <><Loader2 size={14} className="animate-spin" /> Checking...</>
+                    <><Loader2 size={14} className="animate-spin" /> {redirecting ? 'Redirecting...' : 'Checking...'}</>
                   ) : (
                     <>Pay GH₵{totalGHS.toLocaleString() || "—"} Securely</>
                   )}
