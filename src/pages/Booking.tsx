@@ -66,6 +66,9 @@ export default function Booking() {
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [form, setForm] = useState({ name: "", email: "", phone: "", notes: "" });
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [paying, setPaying] = useState(false);
+  const [availabilityError, setAvailabilityError] = useState("");
+  const [bookingRef, setBookingRef] = useState("");
   const [rooms, setRooms] = useState<1 | 2>(1);
   const [basePrice, setBasePrice] = useState(1800); // Default for 1BDR
 
