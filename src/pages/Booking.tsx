@@ -305,6 +305,7 @@ export default function Booking() {
       status: "pending", // ── SECURITY: Start as pending until server verifies ──
       special_requests: form.notes || null,
       stripe_payment_id: paystackRef,
+      apartment_type: `${rooms} Bedroom`,
     });
 
     if (error) {
@@ -348,7 +349,7 @@ export default function Booking() {
     await tg.newBooking({
       guestName: form.name,
       guestPhone: form.phone,
-      bedrooms: apartment.bedrooms,
+      bedrooms: rooms,
       checkIn: format(new Date(checkIn), "dd MMM yyyy"),
       checkOut: format(new Date(checkOut), "dd MMM yyyy"),
       nights,
