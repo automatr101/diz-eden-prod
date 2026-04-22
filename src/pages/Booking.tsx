@@ -553,9 +553,10 @@ export default function Booking() {
                 )}
                 {errors.dates && <p className="mt-2 text-red-400 text-xs">{errors.dates}</p>}
               </div>
+            </div>
 
-              {/* Guest Details */}
-              <div id="guest-details" className="bg-white/[0.03] border border-white/5 rounded-3xl p-7 scroll-mt-24">
+            {/* Guest Details */}
+            <div id="guest-details" className="bg-white/[0.03] border border-white/5 rounded-3xl p-7 scroll-mt-24">
                 <h2 className="text-white font-semibold mb-5 flex items-center gap-2">
                   <Users size={18} className="text-gold" />
                   Your Details
