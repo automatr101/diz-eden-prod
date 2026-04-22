@@ -66,12 +66,8 @@ export default function Booking() {
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [form, setForm] = useState({ name: "", email: "", phone: "", notes: "" });
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [paying, setPaying] = useState(false);
-  const [redirecting, setRedirecting] = useState(false);
-  const [bookingRef, setBookingRef] = useState("");
-  const [availabilityError, setAvailabilityError] = useState("");
-
-  const [basePrice, setBasePrice] = useState(apartment.basePrice);
+  const [rooms, setRooms] = useState<1 | 2>(1);
+  const [basePrice, setBasePrice] = useState(1800); // Default for 1BDR
 
   const nights = checkIn && checkOut
     ? Math.max(0, differenceInCalendarDays(new Date(checkOut), new Date(checkIn)))
@@ -130,13 +126,17 @@ export default function Booking() {
 
   useEffect(() => {
     async function fetchPricing() {
-      const { data } = await supabase.from('settings').select('*').eq('key', 'nightly_rate').single();
+      const key = rooms === 2 ? 'nightly_rate_2bed' : 'nightly_rate';
+      const { data } = await supabase.from('settings').select('*').eq('key', key).single();
       if (data && data.value) {
         setBasePrice(Number(data.value));
+      } else {
+        // Fallback defaults if settings row is missing
+        setBasePrice(rooms === 2 ? 3200 : 1800);
       }
     }
     fetchPricing();
-  }, []);
+  }, [rooms]);
 
   // Real-time availability check
   useEffect(() => {
@@ -219,57 +219,54 @@ export default function Booking() {
     }
 
     setStep("payment");
-    await launchPaystackRedirect(paystackKey);
+    launchPaystack(paystackKey);
   };
 
-  const launchPaystackRedirect = async (paystackKey: string) => {
+  const launchPaystack = (paystackKey: string) => {
+    if (!window.PaystackPop) {
+      alert("Payment system not loaded. Please disable your adblocker and refresh.");
+      setPaying(false);
+      return;
+    }
+
     const ref = `DE-${Date.now().toString(36).toUpperCase()}`;
-    
+
     try {
-      console.log("Initializing secure payment session...");
-      const { data, error } = await supabase.functions.invoke("create-payment", {
-        body: {
-          email: form.email,
-          amount: totalPesewas,
-          reference: ref,
-          metadata: {
-            custom_fields: [
-              { display_name: "Guest Name", variable_name: "guest_name", value: form.name },
-              { display_name: "Phone", variable_name: "phone", value: form.phone },
-              { display_name: "Property", variable_name: "property", value: apartment.name },
-              { display_name: "Check-in", variable_name: "check_in", value: checkIn },
-              { display_name: "Check-out", variable_name: "check_out", value: checkOut },
-            ],
-          },
+      const handler = window.PaystackPop.setup({
+        key: paystackKey,
+        email: form.email,
+        amount: totalPesewas,
+        currency: "GHS",
+        ref: ref,
+        metadata: {
+          custom_fields: [
+            { display_name: "Guest Name", variable_name: "guest_name", value: form.name },
+            { display_name: "Phone", variable_name: "phone", value: form.phone },
+            { display_name: "Apartment", variable_name: "rooms", value: `${rooms} Bedroom` },
+            { display_name: "Check-in", variable_name: "check_in", value: checkIn },
+            { display_name: "Check-out", variable_name: "check_out", value: checkOut },
+          ],
+        },
+        callback: (response: any) => {
+          handlePaymentSuccess(response.reference, ref).catch(console.error);
+        },
+        onClose: () => {
+          setPaying(false);
+          setStep("details");
         },
       });
 
-      if (error || !data?.status) {
-        throw new Error(error?.message || data?.error || data?.message || "Could not initialize payment session.");
-      }
-
-      console.log("Redirecting to Paystack:", data.data.authorization_url);
-      setRedirecting(true);
-      
+      handler.openIframe();
       tg.bookingStarted({ guestName: form.name, total: totalPesewas / 100, ref }).catch(console.error);
-      
-      // Save temporary booking for the callback to find
-      localStorage.setItem("pending_booking", JSON.stringify({
-        form, checkIn, checkOut, guests, nights, basePrice, totalGHS, ref
-      }));
-
-      window.location.href = data.data.authorization_url;
     } catch (err: any) {
-      console.error("Payment Error:", err);
-      alert("Payment initialization failed: " + err.message);
+      console.error("Paystack Error:", err);
+      alert("Payment window failed to open. Please try again.");
       setPaying(false);
-      setRedirecting(false);
     }
   };
 
   const handleCallback = async (ref: string) => {
     setPaying(true);
-    setRedirecting(true);
     const saved = localStorage.getItem("pending_booking");
     if (saved) {
       const b = JSON.parse(saved);
@@ -279,13 +276,11 @@ export default function Booking() {
     } else {
       setStep("details");
       setPaying(false);
-      setRedirecting(false);
     }
   };
 
   useEffect(() => {
     const trxRef = params.get("trxref") || params.get("reference");
-    const status = params.get("status");
     if (trxRef) {
       handleCallback(trxRef);
     }
@@ -506,10 +501,38 @@ export default function Booking() {
                   </button>
                 </div>
 
-                <div>
-                  <label className="text-[10px] uppercase tracking-widest text-gold font-bold block mb-2">
-                    Guests
-                  </label>
+                <div className="space-y-4 mb-4">
+                  <div>
+                    <label className="text-[10px] uppercase tracking-widest text-gold font-bold block mb-2">
+                      Apartment Type
+                    </label>
+                    <div className="grid grid-cols-2 gap-3">
+                      {[
+                        { id: 1, label: "1 Bedroom", price: "GH₵ 1,800" },
+                        { id: 2, label: "2 Bedrooms", price: "GH₵ 3,200" },
+                      ].map((type) => (
+                        <button
+                          key={type.id}
+                          onClick={() => setRooms(type.id as 1 | 2)}
+                          className={`px-4 py-3 rounded-xl border text-left transition-all ${
+                            rooms === type.id
+                              ? "bg-gold border-gold text-eden"
+                              : "bg-white/5 border-white/10 text-white hover:border-gold/50"
+                          }`}
+                        >
+                          <div className={`text-xs font-bold uppercase tracking-tight ${rooms === type.id ? "text-eden/80" : "text-gold"}`}>
+                            {type.label}
+                          </div>
+                          <div className="text-[10px] opacity-70 mt-0.5">{type.price} / night</div>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="text-[10px] uppercase tracking-widest text-gold font-bold block mb-2">
+                      Guests
+                    </label>
                   <select
                     value={guests}
                     onChange={(e) => setGuests(Number(e.target.value))}
@@ -603,7 +626,7 @@ export default function Booking() {
                       </div>
                       <div className="flex justify-between">
                         <span className="text-cream/50">
-                          GH₵{apartment.basePrice.toLocaleString()} × {nights} night{nights > 1 ? "s" : ""}
+                          GH₵{basePrice.toLocaleString()} × {nights} night{nights > 1 ? "s" : ""}
                         </span>
                         <span className="text-white">GH₵{totalGHS.toLocaleString()}</span>
                       </div>
@@ -624,7 +647,7 @@ export default function Booking() {
                   className="w-full bg-gold text-eden font-bold text-[10px] sm:text-xs uppercase tracking-[0.2em] py-4 sm:py-5 rounded-2xl hover:bg-white transition-all duration-300 disabled:opacity-40 flex items-center justify-center gap-2 shadow-[0_15px_30px_-10px_rgba(212,175,55,0.5)]"
                 >
                   {paying ? (
-                    <><Loader2 size={14} className="animate-spin" /> {redirecting ? 'Redirecting...' : 'Checking...'}</>
+                    <><Loader2 size={14} className="animate-spin" /> Processing...</>
                   ) : (
                     <>Pay GH₵{totalGHS.toLocaleString() || "—"} Securely</>
                   )}
