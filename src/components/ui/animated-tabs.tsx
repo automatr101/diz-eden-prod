@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { BouncingDots } from "@/components/ui/bouncing-dots";
 import { Users, BedDouble, Star } from "lucide-react";
+import { OptimizedImage } from "@/components/ui/optimized-image";
 import { useCurrency } from "@/hooks/useCurrency";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -130,7 +131,7 @@ const AnimatedTabs = ({ className }: AnimatedTabsProps) => {
               >
                 {/* Image + Price Badge */}
                 <div className="relative">
-                  <img
+                  <OptimizedImage
                     src={stay.image}
                     alt={stay.imageAlt}
                     className="rounded-2xl w-full h-[380px] object-cover shadow-2xl border border-white/10"

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { fadeInUp, viewportOnce } from "@/lib/animations";
+import { OptimizedImage } from "@/components/ui/optimized-image";
 
 const allImages = [
   "/gallery/DIZ EDEN-9.jpg", "/gallery/DIZ EDEN-11.jpg", "/gallery/DIZ EDEN-15.jpg", 
@@ -76,15 +77,20 @@ export default function MosaicSlideshow() {
           {gridImages.map((img, idx) => (
             <div key={idx} className="relative overflow-hidden group bg-eden">
               <AnimatePresence mode="popLayout">
-                <motion.img
+                <motion.div
                   key={img}
-                  src={img}
                   initial={{ opacity: 0, scale: 1.1 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.95 }}
                   transition={{ duration: 1.2, ease: "easeInOut" }}
-                  className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
-                />
+                  className="absolute inset-0 h-full w-full"
+                >
+                  <OptimizedImage
+                    src={img}
+                    alt="Diz Eden gallery mosaic"
+                    className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+                  />
+                </motion.div>
               </AnimatePresence>
               <div className="absolute inset-0 bg-black/10 transition-colors group-hover:bg-transparent" />
             </div>

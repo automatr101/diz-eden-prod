@@ -11,12 +11,19 @@ type Message = {
   timestamp: Date;
 };
 
+const SUGGESTED_QUESTIONS = [
+  { label: "Nightly Rates", text: "What are your nightly rates for the suites?" },
+  { label: "Amenities", text: "What amenities are included in the stay?" },
+  { label: "Check-in Info", text: "How does the check-in process work?" },
+  { label: "Location", text: "Where exactly is Diz Eden located?" },
+];
+
 export const Chatbot = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "welcome",
-      text: "Welcome to Diz Eden! I'm your AI assistant. How can I help you today?",
+      text: "Welcome to Diz Eden. I'm Eden, your personal concierge. How may I assist you in crafting your perfect stay in East Legon today?",
       isUser: false,
       timestamp: new Date(),
     },
@@ -35,10 +42,11 @@ export const Chatbot = () => {
     }
   }, [messages, isOpen]);
 
-  const handleSend = async () => {
-    if (!inputValue.trim() || isLoading) return;
+  const handleSend = async (overrideText?: string) => {
+    const textToSend = overrideText || inputValue;
+    if (!textToSend.trim() || isLoading) return;
 
-    const userText = inputValue.trim();
+    const userText = textToSend.trim();
     const newUserMsg: Message = {
       id: Date.now().toString(),
       text: userText,
@@ -138,6 +146,21 @@ export const Chatbot = () => {
                 </div>
               </div>
             ))}
+            
+            {messages.length === 1 && (
+              <div className="flex flex-wrap gap-2 pt-2 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300">
+                {SUGGESTED_QUESTIONS.map((q) => (
+                  <button
+                    key={q.label}
+                    onClick={() => handleSend(q.text)}
+                    className="text-[11px] bg-white/5 hover:bg-gold/10 border border-gold/10 hover:border-gold/30 text-gold/70 hover:text-gold px-3 py-2 rounded-full transition-all duration-300 backdrop-blur-sm"
+                  >
+                    {q.label}
+                  </button>
+                ))}
+              </div>
+            )}
+
             {isLoading && (
               <div className="flex justify-start animate-in fade-in duration-500">
                 <div className="bg-[#2A3530] border border-gold/10 p-4 rounded-2xl rounded-tl-none shadow-sm flex items-center gap-3">
@@ -158,12 +181,12 @@ export const Chatbot = () => {
                 placeholder="Ask your AI assistant..."
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
-                onKeyPress={(e) => e.key === "Enter" && handleSend()}
+                onKeyDown={(e) => e.key === "Enter" && handleSend()}
                 disabled={isLoading}
                 className="bg-eden/50 border-gold/20 text-gold placeholder:text-gold/30 rounded-xl focus-visible:ring-gold/30 h-11"
               />
               <button
-                onClick={handleSend}
+                onClick={() => handleSend()}
                 disabled={isLoading || !inputValue.trim()}
                 className="bg-gold hover:bg-gold-dark text-eden p-2.5 rounded-xl transition-all duration-300 disabled:opacity-50 disabled:grayscale flex items-center justify-center shadow-[0_0_15px_rgba(212,175,55,0.2)]"
               >

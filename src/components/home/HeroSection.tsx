@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import heroImg from "@/assets/pics/hero-main.jpg";
 import { fadeInUp, fadeIn, staggerContainer } from "@/lib/animations";
 import SparkleText from "@/components/ui/sparkle-text";
+import { OptimizedImage } from "@/components/ui/optimized-image";
 
 export default function HeroSection() {
   const businessName = "Diz Eden";
@@ -117,10 +118,12 @@ export default function HeroSection() {
           animate="animate"
           className="relative h-[60vh] lg:h-auto m-3 sm:m-6 rounded-[2rem] sm:rounded-[4rem] overflow-hidden shadow-2xl"
         >
-          <img
+          <OptimizedImage
             src={heroImg}
             alt="Diz Eden luxury apartment interior in East Legon, Accra"
             className="absolute inset-0 h-full w-full object-cover"
+            fetchPriority="high"
+            loading="eager"
           />
         </motion.div>
       </div>

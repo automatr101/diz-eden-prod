@@ -4,6 +4,7 @@ import { BedDouble, Bath, Users, Maximize, ChevronLeft, MapPin } from "lucide-re
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import BookingWidget from "@/components/booking/BookingWidget";
+import { OptimizedImage } from "@/components/ui/optimized-image";
 import { usePropertyBySlug } from "@/hooks/useProperty";
 import { properties as staticProperties } from "@/lib/properties";
 
@@ -42,11 +43,21 @@ export default function PropertyDetail() {
             className="grid gap-2 lg:grid-cols-[2fr_1fr_1fr] lg:grid-rows-2 lg:aspect-[2.4/1] overflow-hidden"
           >
             <div className="lg:row-span-2 overflow-hidden">
-              <img src={heroImage} alt={property.name} className="h-full w-full object-cover" />
+              <OptimizedImage 
+                src={heroImage} 
+                alt={property.name} 
+                className="h-full w-full object-cover" 
+                fetchPriority="high"
+                loading="eager"
+              />
             </div>
             {dbImages.slice(1, 5).map((img, i) => (
               <div key={i} className="hidden lg:block overflow-hidden">
-                <img src={img} alt={`${property.name} ${i + 2}`} className="h-full w-full object-cover" />
+                <OptimizedImage 
+                  src={img} 
+                  alt={`${property.name} ${i + 2}`} 
+                  className="h-full w-full object-cover" 
+                />
               </div>
             ))}
           </motion.div>
