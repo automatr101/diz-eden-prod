@@ -11,6 +11,7 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { BouncingDots } from "@/components/ui/bouncing-dots";
 import WhatsAppWidget from "@/components/ui/whatsapp-widget";
+import { Chatbot } from "@/components/Chatbot";
 import { AnimatePresence, motion } from "framer-motion";
 
 export default function Index() {
@@ -53,6 +54,7 @@ export default function Index() {
       </main>
       <Footer />
       <WhatsAppWidget />
+      <Chatbot />
     </>
   );
 }

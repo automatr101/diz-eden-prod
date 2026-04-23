@@ -13,6 +13,7 @@ import AdminPage from "./pages/admin/AdminPage";
 import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
 import Cancellation from "./pages/Cancellation";
+import { Chatbot } from "@/components/Chatbot";
 
 const queryClient = new QueryClient();
 
@@ -34,6 +35,7 @@ const App = () => (
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
+      <Chatbot />
     </TooltipProvider>
   </QueryClientProvider>
 );
