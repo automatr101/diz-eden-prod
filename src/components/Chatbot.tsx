@@ -177,12 +177,20 @@ export const Chatbot = () => {
             <div className="absolute -bottom-1 right-5 w-2 h-2 bg-primary rotate-45"></div>
           </div>
           <button
-            className="relative flex items-center justify-center rounded-full h-14 w-14 sm:h-16 sm:w-16 shadow-[0_10px_30px_-5px_rgba(212,175,55,0.4)] hover:scale-110 transition-all duration-300 bg-gradient-to-tr from-[#d4af37] to-[#f5d061] text-[#1A2520] hover:brightness-110 border border-white/30"
+            className="relative flex items-center justify-center rounded-2xl h-14 w-14 sm:h-16 sm:w-16 shadow-[0_20px_40px_rgba(0,0,0,0.4)] hover:scale-105 transition-all duration-500 bg-eden border border-gold/30 backdrop-blur-sm group overflow-hidden"
             onClick={() => setIsOpen(true)}
             aria-label="Open AI Concierge"
           >
-            <div className="absolute inset-0 rounded-full animate-ping bg-[#d4af37] opacity-20 duration-3000"></div>
-            <Sparkles className="w-6 h-6 sm:w-8 sm:h-8 relative z-10" strokeWidth={2.5} />
+            {/* Shimmering highlight */}
+            <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+            
+            {/* Inner glow */}
+            <div className="absolute inset-0 rounded-2xl bg-gold/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            
+            {/* Pulsing border effect */}
+            <div className="absolute inset-[-2px] rounded-[18px] border border-gold/20 animate-pulse opacity-50 group-hover:opacity-100"></div>
+
+            <Sparkles className="w-6 h-6 sm:w-8 sm:h-8 text-gold relative z-10 drop-shadow-[0_0_8px_rgba(212,175,55,0.5)]" strokeWidth={1.5} />
           </button>
         </div>
       )}
