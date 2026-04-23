@@ -102,8 +102,8 @@ export const Chatbot = () => {
         <div className="bg-[#1A2520]/95 backdrop-blur-xl border border-gold/20 rounded-2xl shadow-[0_30px_60px_-12px_rgba(0,0,0,0.5)] w-[380px] max-w-[calc(100vw-3rem)] h-[600px] max-h-[calc(100vh-8rem)] flex flex-col overflow-hidden animate-in slide-in-from-bottom-10 duration-500 ease-out">
           <div className="bg-gradient-to-b from-eden to-eden/80 p-5 flex justify-between items-center border-b border-gold/10">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gold/10 flex items-center justify-center border border-gold/20 shadow-inner">
-                <Headset className="w-5 h-5 text-gold" />
+              <div className="w-10 h-10 rounded-xl bg-eden flex items-center justify-center border border-gold/20 shadow-inner overflow-hidden">
+                <img src="/logo.png" alt="Diz Eden" className="w-full h-full object-contain" />
               </div>
               <div>
                 <h3 className="font-display font-semibold text-gold text-base tracking-wide">Eden AI Assistant</h3>
@@ -192,7 +192,7 @@ export const Chatbot = () => {
             {/* Pulsing border effect */}
             <div className="absolute inset-[-2px] rounded-[18px] border border-gold/20 animate-pulse opacity-50 group-hover:opacity-100"></div>
 
-            <Headset className="w-6 h-6 sm:w-8 sm:h-8 text-gold relative z-10 drop-shadow-[0_0_8px_rgba(212,175,55,0.5)]" strokeWidth={1.5} />
+            <img src="/logo.png" alt="Chat" className="w-8 h-8 sm:w-10 sm:h-10 relative z-10 object-contain rounded-lg" />
           </button>
         </div>
       )}

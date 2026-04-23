@@ -78,8 +78,7 @@ export default function Navbar() {
               <img
                 src="/logo.png"
                 alt="Diz Eden"
-                className={`transition-all duration-500 object-cover rounded-full ${scrolled ? 'h-9 w-9' : 'h-11 w-11 sm:h-14 sm:w-14'}`}
-                style={{ objectPosition: 'center 35%', transform: 'scale(1.4)', transformOrigin: 'center 35%' }}
+                className={`transition-all duration-500 object-contain rounded-full ${scrolled ? 'h-9 w-9' : 'h-11 w-11 sm:h-14 sm:w-14'}`}
               />
             </div>
             {!scrolled && (
