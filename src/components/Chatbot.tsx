@@ -16,7 +16,7 @@ export const Chatbot = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "welcome",
-      text: "Welcome to Diz Eden! I'm your AI concierge. How can I help you today?",
+      text: "Welcome to Diz Eden! I'm your AI assistant. How can I help you today?",
       isUser: false,
       timestamp: new Date(),
     },
@@ -80,7 +80,7 @@ export const Chatbot = () => {
       console.error("Chatbot error:", error);
       const errorMsg: Message = {
         id: (Date.now() + 1).toString(),
-        text: "I'm sorry, I encountered an error connecting to my brain. Please try again or reach out via WhatsApp.",
+        text: "I'm having a brief moment of silence. Please try again in a few seconds or reach out via WhatsApp for immediate support.",
         isUser: false,
         timestamp: new Date(),
       };
@@ -106,10 +106,10 @@ export const Chatbot = () => {
                 <Headset className="w-5 h-5 text-gold" />
               </div>
               <div>
-                <h3 className="font-display font-semibold text-gold text-base tracking-wide">Eden Concierge</h3>
+                <h3 className="font-display font-semibold text-gold text-base tracking-wide">Eden AI Assistant</h3>
                 <p className="text-[10px] text-gold/60 uppercase tracking-widest flex items-center gap-1.5 font-medium">
                   <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.6)]"></span>
-                  Bespoke Service Active
+                  AI Assistant Active
                 </p>
               </div>
             </div>
@@ -155,7 +155,7 @@ export const Chatbot = () => {
           <div className="p-5 bg-eden/40 backdrop-blur-md border-t border-gold/10">
             <div className="flex gap-3">
               <Input
-                placeholder="Ask your concierge..."
+                placeholder="Ask your AI assistant..."
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyPress={(e) => e.key === "Enter" && handleSend()}
@@ -175,13 +175,13 @@ export const Chatbot = () => {
       ) : (
         <div className="relative group">
           <div className="absolute -top-12 right-0 bg-primary text-primary-foreground px-4 py-2 rounded-lg text-sm font-medium shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none whitespace-nowrap">
-            Chat with our AI Concierge
+            Chat with our AI Assistant
             <div className="absolute -bottom-1 right-5 w-2 h-2 bg-primary rotate-45"></div>
           </div>
           <button
             className="relative flex items-center justify-center rounded-2xl h-14 w-14 sm:h-16 sm:w-16 shadow-[0_20px_40px_rgba(0,0,0,0.4)] hover:scale-105 transition-all duration-500 bg-eden border border-gold/30 backdrop-blur-sm group overflow-hidden"
             onClick={() => setIsOpen(true)}
-            aria-label="Open AI Concierge"
+            aria-label="Open AI Assistant"
           >
             {/* Shimmering highlight */}
             <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
