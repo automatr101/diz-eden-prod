@@ -176,13 +176,14 @@ export const Chatbot = () => {
             Chat with our AI Concierge
             <div className="absolute -bottom-1 right-5 w-2 h-2 bg-primary rotate-45"></div>
           </div>
-          <Button
-            size="lg"
-            className="rounded-full h-14 w-14 shadow-[0_10px_30px_-5px_rgba(212,175,55,0.4)] hover:scale-110 transition-all duration-300 bg-gradient-to-tr from-gold to-[#f5d061] text-eden hover:opacity-90 border border-white/20"
+          <button
+            className="relative flex items-center justify-center rounded-full h-14 w-14 sm:h-16 sm:w-16 shadow-[0_10px_30px_-5px_rgba(212,175,55,0.4)] hover:scale-110 transition-all duration-300 bg-gradient-to-tr from-[#d4af37] to-[#f5d061] text-[#1A2520] hover:brightness-110 border border-white/30"
             onClick={() => setIsOpen(true)}
+            aria-label="Open AI Concierge"
           >
-            <Sparkles className="w-6 h-6" />
-          </Button>
+            <div className="absolute inset-0 rounded-full animate-ping bg-[#d4af37] opacity-20 duration-3000"></div>
+            <Sparkles className="w-6 h-6 sm:w-8 sm:h-8 relative z-10" strokeWidth={2.5} />
+          </button>
         </div>
       )}
     </div>
