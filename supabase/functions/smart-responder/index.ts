@@ -109,7 +109,7 @@ serve(async (req) => {
     console.error("Chat bot error:", error.message);
     return new Response(
       JSON.stringify({
-        reply: "I'm having a little trouble right now. Please try again or reach out to us directly via WhatsApp.",
+        reply: "I'm currently experiencing a high volume of requests. Please try again in a moment or reach out to us directly via WhatsApp for immediate assistance.",
         error: error.message,
       }),
       {

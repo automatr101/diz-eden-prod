@@ -80,7 +80,7 @@ export const Chatbot = () => {
       console.error("Chatbot error:", error);
       const errorMsg: Message = {
         id: (Date.now() + 1).toString(),
-        text: "I'm having a brief moment of silence. Please try again in a few seconds or reach out via WhatsApp for immediate support.",
+        text: "I'm currently experiencing a high volume of requests. Please try again in a moment or reach out to us directly via WhatsApp for immediate assistance.",
         isUser: false,
         timestamp: new Date(),
       };
@@ -97,9 +97,9 @@ export const Chatbot = () => {
   };
 
   return (
-    <div className="fixed bottom-24 right-6 sm:bottom-[104px] sm:right-8 z-50">
+    <div className="fixed bottom-20 right-4 sm:bottom-24 sm:right-6 md:bottom-[104px] md:right-8 z-50">
       {isOpen ? (
-        <div className="bg-[#1A2520]/95 backdrop-blur-xl border border-gold/20 rounded-2xl shadow-[0_30px_60px_-12px_rgba(0,0,0,0.5)] w-[380px] max-w-[calc(100vw-3rem)] h-[600px] max-h-[calc(100vh-8rem)] flex flex-col overflow-hidden animate-in slide-in-from-bottom-10 duration-500 ease-out">
+        <div className="bg-[#1A2520]/95 backdrop-blur-xl border border-gold/20 rounded-2xl shadow-[0_30px_60px_-12px_rgba(0,0,0,0.5)] w-[calc(100vw-2rem)] sm:w-[380px] h-[70vh] sm:h-[600px] flex flex-col overflow-hidden animate-in slide-in-from-bottom-10 duration-500 ease-out">
           <div className="bg-gradient-to-b from-eden to-eden/80 p-5 flex justify-between items-center border-b border-gold/10">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-eden flex items-center justify-center border border-gold/20 shadow-inner overflow-hidden">
@@ -192,7 +192,7 @@ export const Chatbot = () => {
             {/* Pulsing border effect */}
             <div className="absolute inset-[-2px] rounded-[18px] border border-gold/20 animate-pulse opacity-50 group-hover:opacity-100"></div>
 
-            <img src="/logo.png" alt="Chat" className="w-8 h-8 sm:w-10 sm:h-10 relative z-10 object-contain rounded-lg" />
+            <Headset className="w-6 h-6 sm:w-8 sm:h-8 text-gold relative z-10 drop-shadow-[0_0_8px_rgba(212,175,55,0.5)]" strokeWidth={1.5} />
           </button>
         </div>
       )}
