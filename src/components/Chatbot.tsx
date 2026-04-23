@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { MessageCircle, X, Send, Loader2 } from "lucide-react";
+import { MessageCircle, X, Send, Loader2, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
@@ -178,10 +178,10 @@ export const Chatbot = () => {
           </div>
           <Button
             size="lg"
-            className="rounded-full h-14 w-14 shadow-xl hover:scale-110 transition-all duration-300 bg-primary hover:bg-primary/90"
+            className="rounded-full h-14 w-14 shadow-[0_10px_30px_-5px_rgba(212,175,55,0.4)] hover:scale-110 transition-all duration-300 bg-gradient-to-tr from-gold to-[#f5d061] text-eden hover:opacity-90 border border-white/20"
             onClick={() => setIsOpen(true)}
           >
-            <MessageCircle className="w-7 h-7" />
+            <Sparkles className="w-6 h-6" />
           </Button>
         </div>
       )}
