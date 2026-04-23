@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { MessageCircle, X, Send, Loader2, Sparkles } from "lucide-react";
+import { MessageCircle, X, Send, Loader2, Sparkles, Headset } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
@@ -103,7 +103,7 @@ export const Chatbot = () => {
           <div className="bg-gradient-to-b from-eden to-eden/80 p-5 flex justify-between items-center border-b border-gold/10">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-gold/10 flex items-center justify-center border border-gold/20 shadow-inner">
-                <Sparkles className="w-5 h-5 text-gold" />
+                <Headset className="w-5 h-5 text-gold" />
               </div>
               <div>
                 <h3 className="font-display font-semibold text-gold text-base tracking-wide">Eden Concierge</h3>
@@ -192,7 +192,7 @@ export const Chatbot = () => {
             {/* Pulsing border effect */}
             <div className="absolute inset-[-2px] rounded-[18px] border border-gold/20 animate-pulse opacity-50 group-hover:opacity-100"></div>
 
-            <Sparkles className="w-6 h-6 sm:w-8 sm:h-8 text-gold relative z-10 drop-shadow-[0_0_8px_rgba(212,175,55,0.5)]" strokeWidth={1.5} />
+            <Headset className="w-6 h-6 sm:w-8 sm:h-8 text-gold relative z-10 drop-shadow-[0_0_8px_rgba(212,175,55,0.5)]" strokeWidth={1.5} />
           </button>
         </div>
       )}
