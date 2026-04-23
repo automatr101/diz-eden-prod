@@ -48,3 +48,4 @@ export const apartment2BR: Property = {
 };
 
 export const properties: Property[] = [apartment1BR, apartment2BR];
+export const apartment = apartment2BR;
