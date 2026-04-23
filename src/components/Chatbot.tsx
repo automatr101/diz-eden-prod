@@ -99,41 +99,39 @@ export const Chatbot = () => {
   return (
     <div className="fixed bottom-24 right-6 sm:bottom-[104px] sm:right-8 z-50">
       {isOpen ? (
-        <div className="bg-background border border-border rounded-xl shadow-2xl w-[350px] max-w-[calc(100vw-3rem)] h-[500px] max-h-[calc(100vh-6rem)] flex flex-col overflow-hidden animate-in slide-in-from-bottom-5">
-          <div className="bg-primary text-primary-foreground p-4 flex justify-between items-center shadow-md">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-primary-foreground/20 flex items-center justify-center">
-                <MessageCircle className="w-5 h-5 text-primary-foreground" />
+        <div className="bg-[#1A2520]/95 backdrop-blur-xl border border-gold/20 rounded-2xl shadow-[0_30px_60px_-12px_rgba(0,0,0,0.5)] w-[380px] max-w-[calc(100vw-3rem)] h-[600px] max-h-[calc(100vh-8rem)] flex flex-col overflow-hidden animate-in slide-in-from-bottom-10 duration-500 ease-out">
+          <div className="bg-gradient-to-b from-eden to-eden/80 p-5 flex justify-between items-center border-b border-gold/10">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-gold/10 flex items-center justify-center border border-gold/20 shadow-inner">
+                <Sparkles className="w-5 h-5 text-gold" />
               </div>
               <div>
-                <h3 className="font-semibold text-sm">Diz Eden Concierge</h3>
-                <p className="text-[10px] opacity-80 flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></span>
-                  AI Assistant Online
+                <h3 className="font-display font-semibold text-gold text-base tracking-wide">Eden Concierge</h3>
+                <p className="text-[10px] text-gold/60 uppercase tracking-widest flex items-center gap-1.5 font-medium">
+                  <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.6)]"></span>
+                  Bespoke Service Active
                 </p>
               </div>
             </div>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="text-primary-foreground hover:bg-primary/90 h-8 w-8 rounded-full"
+            <button
+              className="text-gold/60 hover:text-gold transition-colors p-1"
               onClick={() => setIsOpen(false)}
             >
-              <X className="w-5 h-5" />
-            </Button>
+              <X className="w-6 h-6" />
+            </button>
           </div>
 
-          <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-muted/30 scrollbar-thin scrollbar-thumb-muted-foreground/20">
+          <div className="flex-1 overflow-y-auto p-5 space-y-5 bg-gradient-to-b from-[#1A2520]/50 to-transparent scroll-smooth">
             {messages.map((msg) => (
               <div
                 key={msg.id}
-                className={`flex ${msg.isUser ? "justify-end" : "justify-start"} animate-in fade-in slide-in-from-bottom-1`}
+                className={`flex ${msg.isUser ? "justify-end" : "justify-start"} animate-in fade-in slide-in-from-bottom-2 duration-300`}
               >
                 <div
-                  className={`max-w-[85%] p-3 rounded-2xl text-sm shadow-sm ${
+                  className={`max-w-[85%] p-4 rounded-2xl text-[13px] leading-relaxed shadow-sm ${
                     msg.isUser
-                      ? "bg-primary text-primary-foreground rounded-br-sm"
-                      : "bg-background border border-border text-foreground rounded-bl-sm"
+                      ? "bg-gold text-eden rounded-tr-none font-medium"
+                      : "bg-[#2A3530] text-gold/90 rounded-tl-none border border-gold/10"
                   }`}
                 >
                   {msg.text}
@@ -141,33 +139,37 @@ export const Chatbot = () => {
               </div>
             ))}
             {isLoading && (
-              <div className="flex justify-start animate-in fade-in">
-                <div className="bg-background border border-border p-3 rounded-2xl rounded-bl-sm shadow-sm flex items-center gap-2">
-                  <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
-                  <span className="text-xs text-muted-foreground">Typing...</span>
+              <div className="flex justify-start animate-in fade-in duration-500">
+                <div className="bg-[#2A3530] border border-gold/10 p-4 rounded-2xl rounded-tl-none shadow-sm flex items-center gap-3">
+                  <div className="flex gap-1">
+                    <span className="w-1.5 h-1.5 bg-gold/40 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
+                    <span className="w-1.5 h-1.5 bg-gold/40 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
+                    <span className="w-1.5 h-1.5 bg-gold/40 rounded-full animate-bounce"></span>
+                  </div>
                 </div>
               </div>
             )}
             <div ref={messagesEndRef} />
           </div>
 
-          <div className="p-4 bg-background border-t border-border flex gap-2 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
-            <Input
-              placeholder="Ask anything about Diz Eden..."
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-              onKeyDown={handleKeyPress}
-              disabled={isLoading}
-              className="flex-1 bg-muted/50 border-none focus-visible:ring-1 focus-visible:ring-primary"
-            />
-            <Button 
-              size="icon" 
-              onClick={handleSend} 
-              disabled={!inputValue.trim() || isLoading}
-              className="rounded-full shrink-0 h-10 w-10"
-            >
-              <Send className="w-4 h-4" />
-            </Button>
+          <div className="p-5 bg-eden/40 backdrop-blur-md border-t border-gold/10">
+            <div className="flex gap-3">
+              <Input
+                placeholder="Ask your concierge..."
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                onKeyPress={(e) => e.key === "Enter" && handleSend()}
+                disabled={isLoading}
+                className="bg-eden/50 border-gold/20 text-gold placeholder:text-gold/30 rounded-xl focus-visible:ring-gold/30 h-11"
+              />
+              <button
+                onClick={handleSend}
+                disabled={isLoading || !inputValue.trim()}
+                className="bg-gold hover:bg-gold-dark text-eden p-2.5 rounded-xl transition-all duration-300 disabled:opacity-50 disabled:grayscale flex items-center justify-center shadow-[0_0_15px_rgba(212,175,55,0.2)]"
+              >
+                <Send className="w-5 h-5" />
+              </button>
+            </div>
           </div>
         </div>
       ) : (
