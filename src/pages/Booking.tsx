@@ -51,6 +51,7 @@ export default function Booking() {
   const initCheckIn = params.get("checkIn") || "";
   const initCheckOut = params.get("checkOut") || "";
   const initGuests = Number(params.get("guests") || 1);
+  const initRooms: 1 | 2 = params.get("rooms") === "2" ? 2 : 1;
   const [step, setStep] = useState<Step>("details");
   const [dateRange, setDateRange] = useState<DateRange | undefined>({
     from: initCheckIn ? new Date(initCheckIn) : undefined,
@@ -69,8 +70,10 @@ export default function Booking() {
   const [paying, setPaying] = useState(false);
   const [availabilityError, setAvailabilityError] = useState("");
   const [bookingRef, setBookingRef] = useState("");
-  const [rooms, setRooms] = useState<1 | 2>(1);
-  const [basePrice, setBasePrice] = useState(apartment1BR.basePrice); // Default for 1BDR
+  const [rooms, setRooms] = useState<1 | 2>(initRooms);
+  const [basePrice, setBasePrice] = useState(
+    initRooms === 2 ? apartment2BR.basePrice : apartment1BR.basePrice
+  );
 
   const nights = checkIn && checkOut
     ? Math.max(0, differenceInCalendarDays(new Date(checkOut), new Date(checkIn)))

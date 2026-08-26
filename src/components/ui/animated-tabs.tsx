@@ -189,7 +189,7 @@ const AnimatedTabs = ({ className }: AnimatedTabsProps) => {
                   {/* Book Now CTA */}
                   <div className="flex justify-center md:justify-start">
                     <a
-                      href={`/booking?guests=${stay.id === "2br" ? 2 : 1}`}
+                      href={`/booking?guests=${stay.id === "2br" ? 2 : 1}&rooms=${stay.id === "2br" ? 2 : 1}`}
                       className="mt-2 inline-flex items-center gap-3 bg-gold text-eden font-bold text-[10px] sm:text-xs uppercase tracking-[0.2em] px-8 py-3.5 sm:py-4 rounded-full w-full sm:w-fit justify-center hover:bg-white transition-all duration-300 hover:scale-105 shadow-[0_10px_20px_-5px_rgba(212,175,55,0.4)]"
                     >
                       Book This Stay
