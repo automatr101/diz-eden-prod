@@ -64,13 +64,19 @@ export default function Booking() {
   const { data: unavailableDates = [] } = useAvailability();
 
   const [guests, setGuests] = useState(initGuests);
+  const [rooms, setRooms] = useState<1 | 2>(initRooms);
+  const maxGuests = rooms === 2 ? apartment2BR.maxGuests : apartment1BR.maxGuests;
+
+  // Clamp guest count when the apartment type changes to a smaller unit
+  useEffect(() => {
+    setGuests((g) => Math.min(g, maxGuests));
+  }, [maxGuests]);
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [form, setForm] = useState({ name: "", email: "", phone: "", notes: "" });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [paying, setPaying] = useState(false);
   const [availabilityError, setAvailabilityError] = useState("");
   const [bookingRef, setBookingRef] = useState("");
-  const [rooms, setRooms] = useState<1 | 2>(initRooms);
   const [basePrice, setBasePrice] = useState(
     initRooms === 2 ? apartment2BR.basePrice : apartment1BR.basePrice
   );
@@ -545,7 +551,7 @@ export default function Booking() {
                     onChange={(e) => setGuests(Number(e.target.value))}
                     className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-gold/50 transition-all cursor-pointer"
                   >
-                    {Array.from({ length: apartment.maxGuests }, (_, i) => i + 1).map((n) => (
+                    {Array.from({ length: maxGuests }, (_, i) => i + 1).map((n) => (
                       <option key={n} value={n} className="bg-[#0a1f14]">
                         {n} Guest{n > 1 ? "s" : ""}
                       </option>
