@@ -30,7 +30,7 @@ declare global {
   }
 }
 
-import { apartment } from "@/lib/properties";
+import { apartment, apartment1BR, apartment2BR } from "@/lib/properties";
 
 type Step = "details" | "payment" | "confirmed";
 
@@ -70,7 +70,7 @@ export default function Booking() {
   const [availabilityError, setAvailabilityError] = useState("");
   const [bookingRef, setBookingRef] = useState("");
   const [rooms, setRooms] = useState<1 | 2>(1);
-  const [basePrice, setBasePrice] = useState(1800); // Default for 1BDR
+  const [basePrice, setBasePrice] = useState(apartment1BR.basePrice); // Default for 1BDR
 
   const nights = checkIn && checkOut
     ? Math.max(0, differenceInCalendarDays(new Date(checkOut), new Date(checkIn)))
@@ -134,8 +134,8 @@ export default function Booking() {
       if (data && data.value) {
         setBasePrice(Number(data.value));
       } else {
-        // Fallback defaults if settings row is missing
-        setBasePrice(rooms === 2 ? 3200 : 1800);
+        // Fallback defaults if settings row is missing — keep in sync with lib/properties.ts
+        setBasePrice(rooms === 2 ? apartment2BR.basePrice : apartment1BR.basePrice);
       }
     }
     fetchPricing();
@@ -512,8 +512,8 @@ export default function Booking() {
                     </label>
                     <div className="grid grid-cols-2 gap-3">
                       {[
-                        { id: 1, label: "1 Bedroom", price: "GH₵ 1,800" },
-                        { id: 2, label: "2 Bedrooms", price: "GH₵ 3,200" },
+                        { id: 1, label: "1 Bedroom", price: `GH₵ ${apartment1BR.basePrice.toLocaleString()}` },
+                        { id: 2, label: "2 Bedrooms", price: `GH₵ ${apartment2BR.basePrice.toLocaleString()}` },
                       ].map((type) => (
                         <button
                           key={type.id}

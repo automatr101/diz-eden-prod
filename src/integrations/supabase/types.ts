@@ -10,7 +10,7 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.5"
+    PostgrestVersion: "14.17"
   }
   public: {
     Tables: {
@@ -19,36 +19,26 @@ export type Database = {
           created_at: string | null
           date: string
           id: string
-          property_id: string | null
           reason: string | null
         }
         Insert: {
           created_at?: string | null
           date: string
           id?: string
-          property_id?: string | null
           reason?: string | null
         }
         Update: {
           created_at?: string | null
           date?: string
           id?: string
-          property_id?: string | null
           reason?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "blocked_dates_property_id_fkey"
-            columns: ["property_id"]
-            isOneToOne: false
-            referencedRelation: "properties"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       bookings: {
         Row: {
-          booking_reference: string
+          apartment_type: string | null
+          booking_reference: string | null
           check_in: string
           check_out: string
           cleaning_fee: number | null
@@ -61,7 +51,6 @@ export type Database = {
           nightly_rate: number
           num_guests: number
           num_nights: number
-          property_id: string | null
           service_fee: number | null
           special_requests: string | null
           status: string | null
@@ -71,7 +60,8 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
-          booking_reference?: string
+          apartment_type?: string | null
+          booking_reference?: string | null
           check_in: string
           check_out: string
           cleaning_fee?: number | null
@@ -82,9 +72,8 @@ export type Database = {
           guest_phone?: string | null
           id?: string
           nightly_rate: number
-          num_guests?: number
+          num_guests: number
           num_nights: number
-          property_id?: string | null
           service_fee?: number | null
           special_requests?: string | null
           status?: string | null
@@ -94,7 +83,8 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
-          booking_reference?: string
+          apartment_type?: string | null
+          booking_reference?: string | null
           check_in?: string
           check_out?: string
           cleaning_fee?: number | null
@@ -107,7 +97,6 @@ export type Database = {
           nightly_rate?: number
           num_guests?: number
           num_nights?: number
-          property_id?: string | null
           service_fee?: number | null
           special_requests?: string | null
           status?: string | null
@@ -116,133 +105,56 @@ export type Database = {
           total_amount?: number
           updated_at?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "bookings_property_id_fkey"
-            columns: ["property_id"]
-            isOneToOne: false
-            referencedRelation: "properties"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      properties: {
-        Row: {
-          amenities: Json | null
-          base_price: number
-          bathrooms: number
-          bedrooms: number
-          cleaning_fee: number | null
-          created_at: string | null
-          description: string | null
-          floor_area_m2: number | null
-          house_rules: Json | null
-          id: string
-          images: Json | null
-          location: string | null
-          max_guests: number
-          name: string
-          published: boolean | null
-          slug: string
-          tagline: string | null
-          updated_at: string | null
-        }
-        Insert: {
-          amenities?: Json | null
-          base_price: number
-          bathrooms: number
-          bedrooms: number
-          cleaning_fee?: number | null
-          created_at?: string | null
-          description?: string | null
-          floor_area_m2?: number | null
-          house_rules?: Json | null
-          id?: string
-          images?: Json | null
-          location?: string | null
-          max_guests: number
-          name: string
-          published?: boolean | null
-          slug: string
-          tagline?: string | null
-          updated_at?: string | null
-        }
-        Update: {
-          amenities?: Json | null
-          base_price?: number
-          bathrooms?: number
-          bedrooms?: number
-          cleaning_fee?: number | null
-          created_at?: string | null
-          description?: string | null
-          floor_area_m2?: number | null
-          house_rules?: Json | null
-          id?: string
-          images?: Json | null
-          location?: string | null
-          max_guests?: number
-          name?: string
-          published?: boolean | null
-          slug?: string
-          tagline?: string | null
-          updated_at?: string | null
-        }
         Relationships: []
       }
       reviews: {
         Row: {
-          booking_id: string | null
           comment: string | null
           created_at: string | null
           guest_name: string
           id: string
-          property_id: string | null
           published: boolean | null
-          rating: number
+          rating: number | null
         }
         Insert: {
-          booking_id?: string | null
           comment?: string | null
           created_at?: string | null
           guest_name: string
           id?: string
-          property_id?: string | null
           published?: boolean | null
-          rating: number
+          rating?: number | null
         }
         Update: {
-          booking_id?: string | null
           comment?: string | null
           created_at?: string | null
           guest_name?: string
           id?: string
-          property_id?: string | null
           published?: boolean | null
-          rating?: number
+          rating?: number | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "reviews_booking_id_fkey"
-            columns: ["booking_id"]
-            isOneToOne: false
-            referencedRelation: "bookings"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "reviews_property_id_fkey"
-            columns: ["property_id"]
-            isOneToOne: false
-            referencedRelation: "properties"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
+      }
+      settings: {
+        Row: {
+          key: string
+          value: string
+        }
+        Insert: {
+          key: string
+          value: string
+        }
+        Update: {
+          key?: string
+          value?: string
+        }
+        Relationships: []
       }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      generate_booking_reference: { Args: never; Returns: string }
     }
     Enums: {
       [_ in never]: never
