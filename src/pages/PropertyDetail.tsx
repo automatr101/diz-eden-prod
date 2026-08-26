@@ -5,7 +5,6 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import BookingWidget from "@/components/booking/BookingWidget";
 import { OptimizedImage } from "@/components/ui/optimized-image";
-import { usePropertyBySlug } from "@/hooks/useProperty";
 import { properties as staticProperties } from "@/lib/properties";
 
 export default function PropertyDetail() {
@@ -73,23 +72,21 @@ export default function PropertyDetail() {
             <span className="text-label-lg text-gold">{property.tagline}</span>
             <h1 className="mt-3 text-display-xl text-foreground">{property.name}</h1>
 
-            {property.location && (
-              <div className="mt-2 flex items-center gap-1.5 text-body-md text-mid">
-                <MapPin size={14} className="text-gold" />
-                {property.location}
-              </div>
-            )}
+            <div className="mt-2 flex items-center gap-1.5 text-body-md text-mid">
+              <MapPin size={14} className="text-gold" />
+              East Legon, Accra, Ghana
+            </div>
 
             <div className="mt-4 flex flex-wrap items-center gap-4 text-body-md text-mid">
               <span className="flex items-center gap-1.5"><BedDouble size={14} className="text-gold" />{property.bedrooms} bedroom{property.bedrooms > 1 ? "s" : ""}</span>
               <span className="text-stone">·</span>
               <span className="flex items-center gap-1.5"><Bath size={14} className="text-gold" />{property.bathrooms} bathroom{property.bathrooms > 1 ? "s" : ""}</span>
               <span className="text-stone">·</span>
-              <span className="flex items-center gap-1.5"><Users size={14} className="text-gold" />{property.max_guests} guests</span>
-              {property.floor_area_m2 && (
+              <span className="flex items-center gap-1.5"><Users size={14} className="text-gold" />{property.maxGuests} guests</span>
+              {property.floorArea && (
                 <>
                   <span className="text-stone">·</span>
-                  <span className="flex items-center gap-1.5"><Maximize size={14} className="text-gold" />{property.floor_area_m2}m²</span>
+                  <span className="flex items-center gap-1.5"><Maximize size={14} className="text-gold" />{property.floorArea}m²</span>
                 </>
               )}
             </div>
