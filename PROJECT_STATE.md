@@ -75,11 +75,53 @@ All of the above verified live on `dizeden.com` after each deploy (Vercel auto-d
     (a known headless-testing limitation — the trigger element and wiring were
     confirmed correct in the DOM). Worth a 5-second manual hover check by the user.
 
+- **Supabase keep-alive workflow added** (commit `53658f5`, outside the launch
+  checklist — user reported the Supabase project kept auto-pausing): free tier
+  pauses a project after ~7 days of no API activity. User chose a scheduled
+  workaround over upgrading to Pro. `.github/workflows/supabase-keepalive.yml`
+  pings a trivial read-only query every 3 days via `curl` + GitHub Actions cron,
+  using `SUPABASE_URL`/`SUPABASE_ANON_KEY` repo secrets (set via `gh secret set`).
+  Verified with a real manual `workflow_dispatch` run — actual HTTP 200 from
+  Supabase, not just a green check. This is a stopgap for the free tier, not a
+  substitute for Pro if hard uptime guarantees start to matter.
+
+- **Launch checklist — Chunk 3 (trust & content additions) done** (commit `2de2941`):
+  - Cookie consent banner: GA previously loaded unconditionally in `index.html`
+    regardless of consent. Now loads dynamically only after Accept, via new
+    `src/lib/analytics.ts` + `useCookieConsent` hook; choice persists in
+    localStorage. Verified live: GA absent pre-consent, loads on Accept.
+  - UTM capture: `utm_source`/`medium`/`campaign`/`term`/`content` captured from
+    the landing URL into sessionStorage (survives SPA route changes, which lose
+    query params) and fed to GA as campaign params whenever analytics loads —
+    even if consent was granted after the user navigated away from the landing URL.
+  - SPA route-change pageview tracking added (`AnalyticsRouteTracker` in
+    `App.tsx`) — previously only one GA pageview ever fired for the whole
+    session, since gtag's automatic pageview fires once on load and React
+    Router navigation doesn't retrigger it.
+  - Expandable FAQ section on the homepage (`FAQSection.tsx`) using the
+    existing Accordion primitive — check-in/out, guest caps, cancellation,
+    payment security, what's included, contact.
+  - Expanded the Booking page's trust row from one line to three badges (SSL
+    Secured, Card Payments, Instant Confirmation) + a no-card-storage line.
+    Deliberately did NOT claim mobile money support — that depends on Paystack
+    dashboard config that couldn't be verified from code; overclaiming payment
+    methods on a checkout page is a real trust risk if wrong.
+  - **Caught and fixed a real bug before shipping**: an early draft placed
+    `<CookieConsentBanner />` (which uses `<Link>`) as a sibling AFTER
+    `</BrowserRouter>` closed instead of inside it, crashing the entire app on
+    load (`Cannot destructure property 'basename' of useContext(...) as it is
+    null`). Caught via local browser testing before it ever reached prod.
+  - All verified live on `dizeden.com`: app mounts correctly, consent banner
+    shows/dismisses/persists, GA gated correctly pre/post consent, FAQ and
+    trust badges render.
+
 ## In Progress
 
-- **Launch checklist — Chunk 3 next** (trust & content additions): cookie consent
-  banner, expandable FAQ section, expanded trust-signal row, UTM param capture.
-  Awaiting go-ahead to start.
+- Launch checklist chunks 1–3 of 4 complete. **Chunk 4 remaining**: Google
+  Search Console verification — needs the real verification code from the
+  user's GSC account (or DNS verification done by the user); the assistant
+  can't generate this, only drop the code into `index.html` once provided.
+  Not started — blocked on user input, not a "go-ahead to start" item.
 
 ## Constraints
 
