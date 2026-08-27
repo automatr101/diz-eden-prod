@@ -55,11 +55,31 @@ All of the above verified live on `dizeden.com` after each deploy (Vercel auto-d
     generic text on every image).
   - All verified live post-deploy via direct DOM/fetch checks on `dizeden.com`.
 
+- **Launch checklist — Chunk 2 (accessibility & UX polish) done** (commit `ce5c0eb`):
+  - Skip-to-content link (`src/components/ui/skip-to-content.tsx`) + `id="main-content"`
+    added to every routed page's `<main>` (and NotFound's wrapper div) as its target.
+  - Global back-to-top button (`back-to-top.tsx`), bottom-left, appears after 600px
+    scroll — bottom-right was already taken by the WhatsApp widget and Chatbot.
+  - Global scroll progress bar (`scroll-progress-bar.tsx`), thin gold bar pinned to
+    the very top of the viewport.
+  - Print stylesheet: `@media print` in `index.css` hides `header`/`footer` and sets
+    plain white/black output; `print:hidden` added to Chatbot/WhatsApp widget roots.
+    Added a "Print Receipt"/"Print" button to both the real inline booking-confirmed
+    view in `Booking.tsx` (what users actually see after paying) and the secondary
+    `/booking/confirmation` route.
+  - Added a tooltip on the Booking page's Guests field explaining the per-apartment-
+    type guest cap — first real usage of the Tooltip primitive anywhere in the app
+    (it was wired via `TooltipProvider` globally but never actually used before).
+  - All verified live except the tooltip's hover-open visual, which Radix Tooltip
+    doesn't reliably show under synthetic/automated pointer events in this sandbox
+    (a known headless-testing limitation — the trigger element and wiring were
+    confirmed correct in the DOM). Worth a 5-second manual hover check by the user.
+
 ## In Progress
 
-- **Launch checklist — Chunk 2 next** (accessibility & UX polish): skip-to-content
-  link, back-to-top button, scroll progress bar, print stylesheet for booking
-  confirmation, tooltip audit. Awaiting go-ahead to start.
+- **Launch checklist — Chunk 3 next** (trust & content additions): cookie consent
+  banner, expandable FAQ section, expanded trust-signal row, UTM param capture.
+  Awaiting go-ahead to start.
 
 ## Constraints
 
