@@ -1,8 +1,15 @@
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { motion } from "framer-motion";
+import { useDocumentMeta } from "@/hooks/useDocumentMeta";
 
 export default function Terms() {
+  useDocumentMeta({
+    title: "Terms of Service — Diz Eden",
+    description: "Booking terms, check-in/check-out policy, house rules, and liability terms for Diz Eden luxury short-stay residences.",
+    path: "/terms",
+  });
+
   return (
     <>
       <Navbar />

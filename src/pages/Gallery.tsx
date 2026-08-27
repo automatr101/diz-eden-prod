@@ -4,6 +4,7 @@ import InteractiveBentoGallery, { MediaItemType } from "@/components/ui/interact
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
+import { useDocumentMeta } from "@/hooks/useDocumentMeta";
 
 // Import pics folder images
 import amenitiesImg from "@/assets/pics/amenities.jpg";
@@ -100,6 +101,12 @@ const mediaItems: MediaItemType[] = [
 ];
 
 const Gallery = () => {
+  useDocumentMeta({
+    title: "Gallery — Diz Eden Luxury Short-Stay Residences",
+    description: "Browse photos of Diz Eden's luxury 1 and 2-bedroom serviced apartments in East Legon, Accra — interiors, amenities, and residence details.",
+    path: "/gallery",
+  });
+
   return (
     <div className="bg-eden min-h-screen">
       <Navbar />

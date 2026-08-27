@@ -1,0 +1,30 @@
+# Diz Eden
+
+> Luxury short-stay serviced apartments in East Legon, Accra, Ghana. Two apartment
+> types available for direct booking: a 1-Bedroom Luxury Suite and a 2-Bedroom Luxury
+> Residence, both with premium amenities and secure online payment via Paystack.
+
+## Property
+
+- 1-Bedroom Luxury Suite: 1 bedroom, 1 bathroom, up to 2 guests, GH₵1,200/night.
+- 2-Bedroom Luxury Residence: 2 bedrooms, 2 bathrooms, up to 4 guests, GH₵1,800/night.
+- Location: East Legon, Accra, Ghana.
+- Amenities: King-sized beds, en-suite bathrooms, gourmet kitchen, high-speed Wi-Fi,
+  Smart TV with Netflix, air conditioning, 24/7 security, private parking, daily
+  housekeeping.
+
+## Pages
+
+- [Homepage](https://dizeden.com/): overview, stay selector, booking bar, testimonials.
+- [About](https://dizeden.com/about): full property details, house rules, amenities.
+- [Gallery](https://dizeden.com/gallery): photos of the residences.
+- [Booking](https://dizeden.com/booking): direct reservation with live pricing and
+  availability, secure checkout via Paystack.
+- [Cancellation Policy](https://dizeden.com/cancellation)
+- [Terms of Service](https://dizeden.com/terms)
+- [Privacy Policy](https://dizeden.com/privacy)
+
+## Contact
+
+- Phone / WhatsApp: +233 25 607 1641
+- Location: East Legon, Accra, Ghana

@@ -3,8 +3,15 @@ import { motion } from "framer-motion";
 import { CheckCircle } from "lucide-react";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
+import { useDocumentMeta } from "@/hooks/useDocumentMeta";
 
 export default function BookingConfirmation() {
+  useDocumentMeta({
+    title: "Booking Confirmed — Diz Eden",
+    path: "/booking/confirmation",
+    noindex: true,
+  });
+
   const [params] = useSearchParams();
   const ref = params.get("ref") || "—";
 

@@ -1,8 +1,15 @@
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { motion } from "framer-motion";
+import { useDocumentMeta } from "@/hooks/useDocumentMeta";
 
 export default function Cancellation() {
+  useDocumentMeta({
+    title: "Cancellation Policy — Diz Eden",
+    description: "Refund and cancellation terms for bookings at Diz Eden luxury short-stay residences in East Legon, Accra.",
+    path: "/cancellation",
+  });
+
   return (
     <>
       <Navbar />

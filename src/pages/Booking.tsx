@@ -31,6 +31,7 @@ declare global {
 }
 
 import { apartment, apartment1BR, apartment2BR } from "@/lib/properties";
+import { useDocumentMeta } from "@/hooks/useDocumentMeta";
 
 type Step = "details" | "payment" | "confirmed";
 
@@ -44,6 +45,12 @@ const RATE_LIMIT_MS = 10_000; // 10 seconds between submissions
 let lastSubmissionTime = 0;
 
 export default function Booking() {
+  useDocumentMeta({
+    title: "Reserve Your Stay — Diz Eden",
+    description: "Book your luxury 1 or 2-bedroom serviced apartment at Diz Eden, East Legon, Accra. Secure checkout via Paystack.",
+    path: "/booking",
+  });
+
   const [params] = useSearchParams();
   const navigate = useNavigate();
 

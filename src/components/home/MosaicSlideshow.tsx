@@ -87,7 +87,7 @@ export default function MosaicSlideshow() {
                 >
                   <OptimizedImage
                     src={img}
-                    alt="Diz Eden gallery mosaic"
+                    alt={`Diz Eden luxury residence, view ${idx + 1}`}
                     className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
                   />
                 </motion.div>

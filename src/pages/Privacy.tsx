@@ -1,8 +1,15 @@
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { motion } from "framer-motion";
+import { useDocumentMeta } from "@/hooks/useDocumentMeta";
 
 export default function Privacy() {
+  useDocumentMeta({
+    title: "Privacy Policy — Diz Eden",
+    description: "How Diz Eden collects, uses, and protects your personal information when you book or browse our luxury short-stay residences.",
+    path: "/privacy",
+  });
+
   return (
     <>
       <Navbar />

@@ -13,9 +13,16 @@ import { BouncingDots } from "@/components/ui/bouncing-dots";
 import WhatsAppWidget from "@/components/ui/whatsapp-widget";
 import { Chatbot } from "@/components/Chatbot";
 import { AnimatePresence, motion } from "framer-motion";
+import { useDocumentMeta } from "@/hooks/useDocumentMeta";
 
 export default function Index() {
   const [loading, setLoading] = useState(true);
+
+  useDocumentMeta({
+    title: "Diz Eden — Luxury Short-Stay Residences",
+    description: "Experience premium short-term rentals in East Legon, Accra. Diz Eden offers luxury 1 and 2-bedroom serviced apartments tailored for discerning travelers. Book direct today.",
+    path: "/",
+  });
 
   useEffect(() => {
     const timer = setTimeout(() => setLoading(false), 2000);

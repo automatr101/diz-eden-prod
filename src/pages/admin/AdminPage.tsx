@@ -12,6 +12,7 @@ import AvailabilityPanel from "./AvailabilityPanel";
 import PricingPanel from "./PricingPanel";
 import ReviewsPanel from "./ReviewsPanel";
 import { cn } from "@/lib/utils";
+import { useDocumentMeta } from "@/hooks/useDocumentMeta";
 
 type Panel = "dashboard" | "bookings" | "availability" | "pricing" | "reviews";
 
@@ -24,6 +25,12 @@ const navItems: { id: Panel; label: string; icon: React.ElementType }[] = [
 ];
 
 export default function AdminPage() {
+  useDocumentMeta({
+    title: "Admin Portal — Diz Eden",
+    path: "/admin",
+    noindex: true,
+  });
+
   const [session, setSession] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [active, setActive] = useState<Panel>("dashboard");

@@ -6,8 +6,15 @@ import Footer from "@/components/layout/Footer";
 import BookingWidget from "@/components/booking/BookingWidget";
 import { OptimizedImage } from "@/components/ui/optimized-image";
 import { properties as staticProperties } from "@/lib/properties";
+import { useDocumentMeta } from "@/hooks/useDocumentMeta";
 
 export default function PropertyDetail() {
+  useDocumentMeta({
+    title: "About Diz Eden — Luxury Residences in East Legon, Accra",
+    description: "Discover Diz Eden's luxury serviced apartments: bedrooms, bathrooms, amenities, house rules, and everything you need to know before booking.",
+    path: "/about",
+  });
+
   const property = staticProperties[0]; // Or `apartment` directly exported
 
   if (!property) {
