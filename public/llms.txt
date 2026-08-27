@@ -15,14 +15,14 @@
 
 ## Pages
 
-- [Homepage](https://dizeden.com/): overview, stay selector, booking bar, testimonials.
-- [About](https://dizeden.com/about): full property details, house rules, amenities.
-- [Gallery](https://dizeden.com/gallery): photos of the residences.
-- [Booking](https://dizeden.com/booking): direct reservation with live pricing and
+- [Homepage](https://www.dizeden.com/): overview, stay selector, booking bar, testimonials.
+- [About](https://www.dizeden.com/about): full property details, house rules, amenities.
+- [Gallery](https://www.dizeden.com/gallery): photos of the residences.
+- [Booking](https://www.dizeden.com/booking): direct reservation with live pricing and
   availability, secure checkout via Paystack.
-- [Cancellation Policy](https://dizeden.com/cancellation)
-- [Terms of Service](https://dizeden.com/terms)
-- [Privacy Policy](https://dizeden.com/privacy)
+- [Cancellation Policy](https://www.dizeden.com/cancellation)
+- [Terms of Service](https://www.dizeden.com/terms)
+- [Privacy Policy](https://www.dizeden.com/privacy)
 
 ## Contact
 

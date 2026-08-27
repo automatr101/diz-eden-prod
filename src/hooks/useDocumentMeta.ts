@@ -7,7 +7,11 @@ interface DocumentMetaOptions {
   noindex?: boolean;
 }
 
-const SITE_URL = "https://dizeden.com";
+// Must match the domain that actually serves 200 (not https://dizeden.com,
+// which 307-redirects to this). Google treats "Page with redirect" URLs as
+// not indexable, so self-referencing the redirecting host here would silently
+// keep every page out of the index. See PROJECT_STATE.md for the full story.
+const SITE_URL = "https://www.dizeden.com";
 
 function setMetaTag(attr: "name" | "property", key: string, content: string) {
   let el = document.querySelector(`meta[${attr}="${key}"]`);
