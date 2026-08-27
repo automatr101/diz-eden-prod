@@ -7,7 +7,7 @@ import { tg } from "@/lib/telegram";
 import { emailApi } from "@/lib/emails";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
-import { BedDouble, Users, CalendarDays, CheckCircle2, Loader2, Shield, CalendarIcon, Info } from "lucide-react";
+import { BedDouble, Users, CalendarDays, CheckCircle2, Loader2, Shield, CalendarIcon, Info, CreditCard, Zap } from "lucide-react";
 import AvailabilityCalendar from "@/components/booking/AvailabilityCalendar";
 import { useAvailability } from "@/hooks/useAvailability";
 import { DateRange } from "react-day-picker";
@@ -696,10 +696,23 @@ export default function Booking() {
                   )}
                 </button>
 
-                <div className="flex items-center justify-center gap-2 mt-4 text-cream/30 text-xs">
-                  <Shield size={12} />
-                  Secured by Paystack · SSL Encrypted
+                <div className="mt-5 pt-5 border-t border-white/5 grid grid-cols-3 gap-2 text-center">
+                  <div className="flex flex-col items-center gap-1.5 text-cream/40">
+                    <Shield size={16} className="text-gold/70" />
+                    <span className="text-[9px] uppercase tracking-wider leading-tight">SSL Secured</span>
+                  </div>
+                  <div className="flex flex-col items-center gap-1.5 text-cream/40">
+                    <CreditCard size={16} className="text-gold/70" />
+                    <span className="text-[9px] uppercase tracking-wider leading-tight">Card Payments</span>
+                  </div>
+                  <div className="flex flex-col items-center gap-1.5 text-cream/40">
+                    <Zap size={16} className="text-gold/70" />
+                    <span className="text-[9px] uppercase tracking-wider leading-tight">Instant Confirmation</span>
+                  </div>
                 </div>
+                <p className="mt-4 text-center text-cream/25 text-[10px]">
+                  Payments processed securely by Paystack. We never see or store your card details.
+                </p>
               </div>
 
               {/* Cancellation Policy */}

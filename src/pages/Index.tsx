@@ -6,6 +6,7 @@ import ExperienceSection from "@/components/home/ExperienceSection";
 import MosaicSlideshow from "@/components/home/MosaicSlideshow";
 import StatsSection from "@/components/home/StatsSection";
 import TestimonialsSection from "@/components/home/TestimonialsSection";
+import FAQSection from "@/components/home/FAQSection";
 import { Contact2 } from "@/components/ui/contact-2";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
@@ -50,6 +51,7 @@ export default function Index() {
         <MosaicSlideshow />
         <StatsSection />
         <TestimonialsSection />
+        <FAQSection />
         <div id="contact">
           <Contact2 
             title="Book Your Home"
