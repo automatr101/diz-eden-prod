@@ -115,13 +115,28 @@ All of the above verified live on `dizeden.com` after each deploy (Vercel auto-d
     shows/dismisses/persists, GA gated correctly pre/post consent, FAQ and
     trust badges render.
 
+- **Launch checklist — Chunk 4 (Google Search Console) done**: turned out
+  `dizeden.com` was already verified in GSC as a Domain property since May
+  2026, with real performance data already flowing (16 clicks, indexing
+  stats) — no verification setup was actually needed, contrary to what the
+  original checklist assumed. Used the Claude-in-Chrome browser (the user's
+  own logged-in Chrome, not the sandboxed preview browser) to check GSC
+  directly. Found the submitted sitemap was stale — Google's last crawl
+  (Aug 19) predated the Chunk 1 fix that expanded `sitemap.xml` from 2 URLs
+  to 7, so GSC still only knew about 2 discovered pages. Resubmitted
+  `sitemap.xml` from the GSC UI to trigger a fresh crawl — confirmed
+  "Sitemap processed successfully." The updated discovered-page count will
+  land on Google's own crawl schedule (typically within a day or so), not
+  instantly — worth a follow-up check in a few days.
+  - **This closes out the full 54-item pre-launch checklist** (`website-launch-checklist.md`),
+    across 4 chunks. See the chunk 1–4 entries above for the complete list of
+    what was implemented; a handful of items were explicitly skipped as
+    inapplicable to this business (see Constraints below) and one (visible
+    contact email) was deferred by the user (see Decisions below).
+
 ## In Progress
 
-- Launch checklist chunks 1–3 of 4 complete. **Chunk 4 remaining**: Google
-  Search Console verification — needs the real verification code from the
-  user's GSC account (or DNS verification done by the user); the assistant
-  can't generate this, only drop the code into `index.html` once provided.
-  Not started — blocked on user input, not a "go-ahead to start" item.
+- Nothing currently in flight. Launch checklist fully complete.
 
 ## Constraints
 
