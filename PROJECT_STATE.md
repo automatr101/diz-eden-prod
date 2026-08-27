@@ -134,9 +134,67 @@ All of the above verified live on `dizeden.com` after each deploy (Vercel auto-d
     inapplicable to this business (see Constraints below) and one (visible
     contact email) was deferred by the user (see Decisions below).
 
+- **Root-caused and fixed a real indexing bug: wrong canonical domain** (skill
+  `google-official-seo-guide` installed via `npx skillfish add
+  zhanlincui/ultimate-agent-skills-collection google-official-seo-guide` and
+  consulted for this). `https://dizeden.com` (apex, no www) 307-redirects to
+  `https://www.dizeden.com` (confirmed via `curl -I`), but every self-referencing
+  URL in the codebase — `sitemap.xml`, `index.html`'s canonical/OG/Twitter tags,
+  `robots.txt`'s Sitemap directive, and `useDocumentMeta.ts`'s `SITE_URL` — pointed
+  at the apex, i.e. at a URL that redirects rather than serves content. Google's
+  own docs: a 307 (temporary) redirect is only a *weak* canonicalization signal,
+  and GSC's Page Indexing report confirmed the exact symptom — reason "Page with
+  redirect" for the flagged URLs. Fixed by pointing every self-reference at
+  `https://www.dizeden.com` (the URL that actually returns 200) instead of fighting
+  Vercel's dashboard-level domain-redirect config, which isn't controllable from
+  this repo. Verified live via curl: sitemap, robots.txt, and rendered canonical
+  tag all now correctly say `www.dizeden.com`.
+  - Also requested fresh indexing via GSC's URL Inspection tool for the homepage
+    and `/booking` (both — priority crawl queue); `/about` request hit a GSC quota
+    error after 3 rapid requests, so stopped there rather than keep retrying.
+    Resubmitted `sitemap.xml` in GSC to get the rest picked up through normal
+    crawling instead. Confirmed "Sitemap processed successfully" but the
+    "Last read" timestamp won't update until Google's own crawler revisits on
+    its own schedule (not instant) — worth checking again in a few days.
+
+- **Diagnosed why "diz eden" shows no results for the actual domain on Google
+  Search** (user's real underlying question — the indexing bug above was
+  necessary to fix but not sufficient to explain this). Findings, most to least
+  actionable:
+  1. **Google Business Profile ("Diz Eden luxury Apartments," 4.8★, 18 reviews)
+     has no Website field set** — confirmed by inspecting the actual Business
+     Profile panel in a live Google search: Address, Phone, and a Facebook
+     profile link are present, but no Website button anywhere. This is likely
+     the single highest-leverage fix available and can only be done by the
+     business owner logging into business.google.com and adding
+     `https://www.dizeden.com` as the website — the assistant has no access to
+     that account. **Asked the user to confirm/do this; they did not respond
+     before the conversation moved on — worth circling back to.**
+  2. **The domain has essentially zero real backlinks.** GSC's Links report
+     shows "External links: Total 1," and that one link is from `vercel.app`
+     (Vercel's own auto-link, not an editorial backlink from anywhere else on
+     the internet). This is why Instagram, Airbnb, a "Family Vacation Rentals"
+     aggregator, and even Google's own hotel-entity page all outrank
+     dizeden.com for its own exact business name — Google has almost no
+     independent trust signal connecting the brand to the domain.
+  3. The canonical-domain indexing bug (see above) was actively preventing
+     proper indexing of most pages; now fixed, but this alone won't overcome
+     the trust/backlink gap in (2).
+  - **Bottom line for ranking**: on-page/technical SEO (what's fixable from
+    this codebase) is now in good shape after chunks 1-4 of the launch
+    checklist plus this fix. Meaningfully improving ranking for niche/branded
+    search terms now depends on off-page factors outside this repo: the
+    Business Profile website field, and building real backlinks (directories,
+    partner sites, guest/press mentions linking to dizeden.com). Don't expect
+    on-page fixes alone to move rankings much further.
+
 ## In Progress
 
-- Nothing currently in flight. Launch checklist fully complete.
+- **Awaiting user action, not blocked on code**: (a) add `https://www.dizeden.com`
+  as the Website on the "Diz Eden luxury Apartments" Google Business Profile,
+  (b) decide whether/how to pursue backlink-building. Follow up on both if the
+  user returns to the ranking topic.
+- Launch checklist itself is fully complete; nothing left there.
 
 ## Constraints
 
