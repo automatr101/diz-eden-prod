@@ -36,7 +36,7 @@ export default function PropertyDetail() {
   return (
     <>
       <Navbar />
-      <main className="pt-24 pb-16">
+      <main id="main-content" className="pt-24 pb-16">
         {/* Gallery */}
         <div className="mx-auto max-w-7xl px-6 lg:px-16">
           <Link to="/properties" className="inline-flex items-center gap-1 text-label-sm text-light-mid hover:text-gold transition-colors mb-6">

@@ -18,7 +18,7 @@ export default function BookingConfirmation() {
   return (
     <>
       <Navbar />
-      <main className="pt-28 pb-16 px-6 lg:px-16">
+      <main id="main-content" className="pt-28 pb-16 px-6 lg:px-16">
         <div className="mx-auto max-w-xl text-center">
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
@@ -36,7 +36,7 @@ export default function BookingConfirmation() {
               <p className="mt-2 font-display text-3xl text-foreground tracking-wider">{ref}</p>
             </div>
 
-            <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center print:hidden">
               <a
                 href={`https://wa.me/233256071641?text=Hi!%20My%20booking%20reference%20is%20${ref}`}
                 target="_blank"
@@ -51,6 +51,13 @@ export default function BookingConfirmation() {
               >
                 Return Home
               </Link>
+              <button
+                type="button"
+                onClick={() => window.print()}
+                className="border border-eden py-4 px-8 text-label-lg tracking-widest text-foreground transition-all duration-300 hover:bg-eden hover:text-cream"
+              >
+                Print
+              </button>
             </div>
           </motion.div>
         </div>

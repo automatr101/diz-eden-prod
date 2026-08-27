@@ -110,7 +110,7 @@ const Gallery = () => {
   return (
     <div className="bg-eden min-h-screen">
       <Navbar />
-      <main className="pt-32 pb-24 relative">
+      <main id="main-content" className="pt-32 pb-24 relative">
         <div className="container mx-auto px-6">
           <Link 
             to="/" 

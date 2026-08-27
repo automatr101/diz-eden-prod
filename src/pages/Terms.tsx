@@ -13,7 +13,7 @@ export default function Terms() {
   return (
     <>
       <Navbar />
-      <main className="min-h-screen bg-eden pt-32 pb-24 text-cream/70">
+      <main id="main-content" className="min-h-screen bg-eden pt-32 pb-24 text-cream/70">
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}

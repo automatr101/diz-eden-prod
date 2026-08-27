@@ -14,12 +14,17 @@ import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
 import Cancellation from "./pages/Cancellation";
 import { Chatbot } from "@/components/Chatbot";
+import { SkipToContent } from "@/components/ui/skip-to-content";
+import { BackToTop } from "@/components/ui/back-to-top";
+import { ScrollProgressBar } from "@/components/ui/scroll-progress-bar";
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
+      <SkipToContent />
+      <ScrollProgressBar />
       <Sonner />
       <BrowserRouter>
         <Routes>
@@ -36,6 +41,7 @@ const App = () => (
         </Routes>
       </BrowserRouter>
       <Chatbot />
+      <BackToTop />
     </TooltipProvider>
   </QueryClientProvider>
 );

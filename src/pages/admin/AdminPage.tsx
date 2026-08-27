@@ -201,7 +201,7 @@ export default function AdminPage() {
         </header>
 
         {/* Panel content */}
-        <main className="flex-1 p-6 lg:p-10">
+        <main id="main-content" className="flex-1 p-6 lg:p-10">
           <AnimatePresence mode="wait">
             <motion.div
               key={active}

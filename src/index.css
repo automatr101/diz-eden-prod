@@ -146,3 +146,21 @@
     letter-spacing: 0.2em;
   }
 }
+
+/* Print stylesheet — hide site chrome, show clean readable content
+   (booking confirmation / receipt is the primary printable page) */
+@media print {
+  header,
+  footer {
+    display: none !important;
+  }
+
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  a[href]::after {
+    content: none !important;
+  }
+}

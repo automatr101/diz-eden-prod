@@ -105,7 +105,7 @@ export const Chatbot = () => {
   };
 
   return (
-    <div className="fixed bottom-20 right-4 sm:bottom-24 sm:right-6 md:bottom-[104px] md:right-8 z-50">
+    <div className="fixed bottom-20 right-4 sm:bottom-24 sm:right-6 md:bottom-[104px] md:right-8 z-50 print:hidden">
       {isOpen ? (
         <div className="bg-[#1A2520]/95 backdrop-blur-xl border border-gold/20 rounded-2xl shadow-[0_30px_60px_-12px_rgba(0,0,0,0.5)] w-[calc(100vw-2rem)] sm:w-[380px] h-[70vh] sm:h-[600px] flex flex-col overflow-hidden animate-in slide-in-from-bottom-10 duration-500 ease-out">
           <div className="bg-gradient-to-b from-eden to-eden/80 p-5 flex justify-between items-center border-b border-gold/10">

@@ -7,11 +7,12 @@ import { tg } from "@/lib/telegram";
 import { emailApi } from "@/lib/emails";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
-import { BedDouble, Users, CalendarDays, CheckCircle2, Loader2, Shield, CalendarIcon } from "lucide-react";
+import { BedDouble, Users, CalendarDays, CheckCircle2, Loader2, Shield, CalendarIcon, Info } from "lucide-react";
 import AvailabilityCalendar from "@/components/booking/AvailabilityCalendar";
 import { useAvailability } from "@/hooks/useAvailability";
 import { DateRange } from "react-day-picker";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 declare global {
   interface Window {
@@ -433,16 +434,25 @@ export default function Booking() {
                 <span className="text-white font-display text-lg">GH₵{totalGHS.toLocaleString()}</span>
               </div>
             </div>
-            <p className="text-cream/40 text-sm mb-6">
+            <p className="text-cream/40 text-sm mb-6 print:hidden">
               A confirmation will be sent to <span className="text-cream/70">{form.email}</span>.
               Our concierge will also reach out on WhatsApp at <span className="text-cream/70">{form.phone}</span>.
             </p>
-            <a
-              href="/"
-              className="inline-block bg-gold text-eden font-bold text-[10px] sm:text-xs uppercase tracking-widest px-8 py-3 sm:px-10 sm:py-4 rounded-full hover:bg-white transition-all shadow-lg shadow-gold/20"
-            >
-              Back to Diz Eden
-            </a>
+            <div className="flex items-center justify-center gap-3 print:hidden">
+              <a
+                href="/"
+                className="inline-block bg-gold text-eden font-bold text-[10px] sm:text-xs uppercase tracking-widest px-8 py-3 sm:px-10 sm:py-4 rounded-full hover:bg-white transition-all shadow-lg shadow-gold/20"
+              >
+                Back to Diz Eden
+              </a>
+              <button
+                type="button"
+                onClick={() => window.print()}
+                className="inline-block border border-white/20 text-white font-bold text-[10px] sm:text-xs uppercase tracking-widest px-8 py-3 sm:px-10 sm:py-4 rounded-full hover:bg-white/10 transition-all"
+              >
+                Print Receipt
+              </button>
+            </div>
           </motion.div>
         </div>
         <Footer />
@@ -454,7 +464,7 @@ export default function Booking() {
   return (
     <>
       <Navbar />
-      <main className="min-h-screen bg-eden pt-48 pb-20 px-6 lg:px-16">
+      <main id="main-content" className="min-h-screen bg-eden pt-48 pb-20 px-6 lg:px-16">
         <div className="mx-auto max-w-6xl">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -550,8 +560,20 @@ export default function Booking() {
                   </div>
 
                   <div>
-                    <label className="text-[10px] uppercase tracking-widest text-gold font-bold block mb-2">
+                    <label className="text-[10px] uppercase tracking-widest text-gold font-bold mb-2 flex items-center gap-1.5">
                       Guests
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <button type="button" aria-label="Guest limit info" className="text-cream/40 hover:text-gold transition-colors">
+                            <Info size={12} />
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent side="top" className="max-w-[220px] text-xs normal-case tracking-normal font-normal">
+                          {rooms === 2
+                            ? "The 2-Bedroom Residence sleeps up to 4 guests."
+                            : "The 1-Bedroom Suite sleeps up to 2 guests. Switch to 2 Bedrooms for up to 4."}
+                        </TooltipContent>
+                      </Tooltip>
                     </label>
                   <select
                     value={guests}

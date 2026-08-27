@@ -42,7 +42,7 @@ export default function Index() {
         )}
       </AnimatePresence>
       <Navbar />
-      <main>
+      <main id="main-content">
         <HeroSection />
         <BookingBar />
         <ResidenceShowcase />
