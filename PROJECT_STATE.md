@@ -37,9 +37,29 @@ Read this file first, before starting any new chunk of work. Update it at the en
 All of the above verified live on `dizeden.com` after each deploy (Vercel auto-deploys
 `main`).
 
+- **Launch checklist — Chunk 1 (SEO/technical) done** (commit `531353a`), from an
+  external 54-item pre-launch checklist audited against the live site first:
+  - Fixed canonical/OG/Twitter URLs — pointed at `dizeden.vercel.app`, now `dizeden.com`.
+  - Added `og:image`/`twitter:image` (was missing entirely — shares had no preview image).
+  - New `src/hooks/useDocumentMeta.ts` sets per-route `<title>`, description, canonical,
+    OG/Twitter tags, and `robots` (index/noindex). Previously every route shared the
+    homepage's static `index.html` metadata. Wired into all routed pages; `/admin`,
+    `/booking/confirmation`, and 404 set `noindex, nofollow`.
+  - Fixed `robots.txt` — wrong domain, and the per-bot blocks (Googlebot etc.) didn't
+    inherit the wildcard's `Disallow /admin`, meaning Googlebot specifically was never
+    told to skip `/admin`. Consolidated to one wildcard rule.
+  - Rebuilt `sitemap.xml` with all real indexable routes + correct domain (was only
+    `/` and `/booking`; now also `/gallery`, `/about`, `/terms`, `/privacy`, `/cancellation`).
+  - Added `public/llms.txt`.
+  - Minor: unique alt text per photo in the homepage mosaic slideshow (was identical
+    generic text on every image).
+  - All verified live post-deploy via direct DOM/fetch checks on `dizeden.com`.
+
 ## In Progress
 
-- Nothing currently in flight.
+- **Launch checklist — Chunk 2 next** (accessibility & UX polish): skip-to-content
+  link, back-to-top button, scroll progress bar, print stylesheet for booking
+  confirmation, tooltip audit. Awaiting go-ahead to start.
 
 ## Constraints
 
@@ -66,6 +86,14 @@ All of the above verified live on `dizeden.com` after each deploy (Vercel auto-d
   bundle inspection + typecheck/build instead, or ask the user to check visually.
 - Never execute a real Paystack payment during testing — stop verification at "Pay
   button enabled with correct amount," never click through to actually charge a card.
+- `settings.owner_email` = `bewinwisdom@gmail.com` — an internal notification address,
+  not necessarily meant to be public-facing. Don't assume it's OK to publish as the
+  site's contact email without asking; user deferred this decision (see below).
+- A generic 54-item pre-launch checklist (from `website-launch-checklist.md`) assumes a
+  multi-service/multi-location business. Several items don't apply to this single
+  boutique 2-unit rental property and were explicitly skipped per user confirmation:
+  blog posts, location pages, one-page-per-service, before/after gallery, dark mode
+  toggle, site search. Don't resurrect these without the user asking again.
 
 ## Decisions Made
 
@@ -77,6 +105,10 @@ All of the above verified live on `dizeden.com` after each deploy (Vercel auto-d
 - **Deploys go straight to `main`** on this repo per user's explicit confirmation
   (asked once before the first push; user said push directly going forward is fine
   for this kind of fix — reconfirm if a change is large/risky rather than a small bug fix).
+- **Visible contact email deferred** — user chose to skip adding a public contact
+  email for now rather than publish the personal Gmail found in `settings.owner_email`.
+  Footer/contact section still show phone + WhatsApp only. Revisit if the user provides
+  a branded address later.
 
 ---
 
