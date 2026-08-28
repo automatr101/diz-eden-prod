@@ -188,12 +188,42 @@ All of the above verified live on `dizeden.com` after each deploy (Vercel auto-d
     partner sites, guest/press mentions linking to dizeden.com). Don't expect
     on-page fixes alone to move rankings much further.
 
+- **Fixed auto date-blocking not releasing on cancellation** (commit `bde8220`,
+  user asked to "check out auto date blocking, when maybe consumer date is
+  up" and how admin manages it). Traced the full flow:
+  - `Booking.tsx` auto-inserts one `blocked_dates` row per night
+    (`reason: "Booked: {ref}"`) when a guest completes payment.
+  - **Bug**: `BookingsPanel.tsx`'s `updateStatus(booking, "cancelled")` only
+    updated `bookings.status` — never touched `blocked_dates`. A cancelled
+    booking's dates stayed permanently blocked/unbookable forever, with no
+    automatic recovery. Real revenue-losing bug. Fixed: cancelling now also
+    deletes the `blocked_dates` rows tagged with that booking's reference.
+  - **Secondary UX bug**: `AvailabilityPanel.tsx`'s calendar showed a guest's
+    active paid booking as generic red "Blocked" (indistinguishable from an
+    admin's manual maintenance block) instead of green "Booked," because
+    `blocked` was checked before `booking` in the CSS class chain. Fixed by
+    giving `booking` visual precedence. Also: the "Blocked Dates" management
+    list mixed in one row per night for every online booking alongside actual
+    manual blocks (e.g. "Maintenance"), same delete button on both, inviting
+    an admin to desync the calendar from reality for no reason. Now filters
+    to manual blocks only (`reason` not starting with `"Booked: "`) — booking
+    dates are managed by cancelling the booking itself, not by deleting
+    calendar rows. Clicking an already-booked day in the calendar no longer
+    offers to "block" it (was previously possible, harmless but confusing).
+  - Verified via `tsc --noEmit` + full `vite build` (both clean, only the
+    pre-existing unrelated `BookingBar.tsx` framer-motion typing error).
+    **Could not click-test the actual cancel→release flow live** — it's
+    behind admin login the assistant doesn't have credentials for, same
+    constraint as every other admin-only change this session. Worth the
+    user doing one real test cancellation to confirm end-to-end.
+
 ## In Progress
 
 - **Awaiting user action, not blocked on code**: (a) add `https://www.dizeden.com`
   as the Website on the "Diz Eden luxury Apartments" Google Business Profile,
-  (b) decide whether/how to pursue backlink-building. Follow up on both if the
-  user returns to the ranking topic.
+  (b) decide whether/how to pursue backlink-building, (c) manually verify the
+  cancel→release-dates fix works end-to-end in the live admin panel. Follow
+  up on these if the user returns to any of these topics.
 - Launch checklist itself is fully complete; nothing left there.
 
 ## Constraints
