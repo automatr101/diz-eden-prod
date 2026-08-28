@@ -379,7 +379,85 @@ All of the above verified live on `dizeden.com` after each deploy (Vercel auto-d
     source/bundle first (as done for the other copy fixes), not the
     Google result, to confirm what's actually deployed.
 
+- **GA4 investigation: the site's real traffic goes to a property nobody
+  on this Google login can access** (commits `37bac98` for the code side;
+  no code change for the GA4-account side, see In Progress below). User
+  asked to "configure Google Analytics properly." Before touching any
+  settings, checked what's actually there:
+  - The site sends analytics to measurement ID **`G-FYMR4XZNQL`**
+    (confirmed straight from the live deployed bundle, and by watching
+    `gtag` actually fire in a real browser test).
+  - Opening Google Analytics with the browser's logged-in session
+    (`team.automatr@gmail.com`) **defaulted to an entirely unrelated
+    property** — "How cooked is your major," which turned out to be
+    someone's other Vercel app (`cooked-major.vercel.app`), not Diz
+    Eden at all. Flagging this as a near-miss: it's easy to glance at
+    that property's real-looking traffic numbers and misattribute them
+    to this site.
+  - The one Diz-Eden-branded property this login *can* open —
+    "Diz Eden Analytics" (property `536967220`, stream "Diz Eden 1.0",
+    pointed at `dizeden.com`) — has measurement ID **`G-1ZF2E4Q5GK`**,
+    which does **not** match the code. It also already has 3 manually-
+    created "key events" (`close_convert_lead`, `purchase`,
+    `qualify_lead`) that show "No stream data detected" — dead stubs
+    someone set up by name only; the code has never sent events with
+    those names, so they've never fired.
+  - A second property, **"Diz Eden Luxury Apartments" (ID `534080571`)**
+    — the closest name match to the real business — exists but returns
+    **"Missing permissions"** for this login. This is almost certainly
+    where `G-FYMR4XZNQL` actually reports, most likely set up by a
+    previous developer/agency under a Google account this login doesn't
+    have access to.
+  - Presented these findings to the user and asked how to proceed
+    (request access vs. switch the site to the property we already
+    control vs. check other Google logins). User chose **"Request
+    access to the real property."** Submitted a **Viewer** access
+    request on property `534080571` from `team.automatr@gmail.com` (the
+    generic "Missing permissions" dialog only offers Viewer-level
+    requests, no role picker — Editor/Admin would need to be granted
+    manually by whoever approves it, or requested again once Viewer
+    access confirms the account structure).
+  - **Added real conversion-event tracking in code while access is
+    pending** (commit `37bac98`) — previously the site only ever sent
+    `page_view` events, nothing else, regardless of which property ends
+    up being the right one:
+    - `trackEvent()` helper added to `analytics.ts` (thin `gtag()`
+      wrapper, same cookie-consent gate as the existing
+      `trackPageview`).
+    - `begin_checkout` fires in `Booking.tsx` when the Paystack iframe
+      opens (same spot as the existing `tg.bookingStarted` Telegram
+      ping).
+    - `purchase` fires once a booking is actually confirmed —
+      standard GA4 ecommerce shape (`transaction_id`, `value`,
+      `currency`, `items`) so it works in GA4's built-in
+      reports/funnels without extra configuration.
+    - `generate_lead` fires on click of the floating WhatsApp widget
+      (`whatsapp-widget.tsx`) — the main non-booking contact path.
+    - Verified `generate_lead` firing live in the dev preview
+      (`dataLayer` push confirmed directly). Did **not** click through
+      the real booking flow to test `begin_checkout`/`purchase` — the
+      dev server hits the same live Supabase backend, and
+      `handleProceedToPayment` triggers a real Telegram notification
+      to the client's channel via `tg.bookingStarted`; didn't want to
+      fire that with test data. Both new events use the identical,
+      already-verified `trackEvent()` helper. Confirmed all three event
+      names (`begin_checkout`, `purchase`, `generate_lead`) present in
+      the live deployed bundle post-push.
+    - `tsc --noEmit` and `vite build` both clean (same pre-existing
+      unrelated `BookingBar` error as always).
+
 ## In Progress
+
+- **GA4 key-event configuration is blocked pending access approval.**
+  Cannot mark `purchase` as a Key Event, clean up the dead stub events
+  (`close_convert_lead`, `qualify_lead` on the wrong property), fix
+  enhanced measurement, or do anything else GA4-admin-side until either
+  (a) the Viewer access request on property `534080571` is approved by
+  whoever administers it, or (b) the user decides instead to abandon
+  that property and point the site at `G-1ZF2E4Q5GK` (the one this
+  login fully controls). Don't attempt GA4 admin changes again until
+  one of those resolves — re-check access status next time this comes
+  up rather than assuming still blocked or assuming resolved.
 
 - **Awaiting user action, not blocked on code**: (a) add `https://www.dizeden.com`
   as the Website on the "Diz Eden luxury Apartments" Google Business Profile,
