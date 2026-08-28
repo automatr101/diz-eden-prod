@@ -20,8 +20,8 @@ export interface Property {
 export const apartment1BR: Property = {
   slug: "diz-eden-luxury-1br",
   name: "Diz Eden 1-Bedroom Luxury Suite",
-  tagline: "Intimate Elegance in East Legon",
-  description: "Perfect for business travelers or couples, our 1-bedroom suite offers the same premium amenities and sophisticated design as our larger residences, providing a private sanctuary of peace and comfort.",
+  tagline: "1-Bedroom Suite in East Legon",
+  description: "A private 1-bedroom suite in East Legon, Accra, ideal for solo travelers or couples — with a king bed, en-suite bathroom, private workspace, high-speed Wi-Fi, and daily housekeeping.",
   bedrooms: 1,
   bathrooms: 1,
   maxGuests: 2,
@@ -35,8 +35,8 @@ export const apartment1BR: Property = {
 export const apartment2BR: Property = {
   slug: "diz-eden-luxury-2br",
   name: "Diz Eden 2-Bedroom Luxury Residence",
-  tagline: "Sophisticated Sanctuary in East Legon",
-  description: "Experience the pinnacle of urban luxury in our meticulously designed 2-bedroom residence. Located in the heart of East Legon, this apartment combines modern aesthetics with the comforts of a high-end home, featuring expansive windows, custom furnishings, and premium finishes.",
+  tagline: "2-Bedroom Residence in East Legon",
+  description: "A 2-bedroom residence in East Legon, Accra, with two en-suite king bedrooms, a gourmet kitchen, and a private balcony — suited to families or groups of up to 4 guests.",
   bedrooms: 2,
   bathrooms: 2,
   maxGuests: 4,

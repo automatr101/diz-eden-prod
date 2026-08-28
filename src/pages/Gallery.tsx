@@ -61,8 +61,8 @@ const mediaItems: MediaItemType[] = [
   {
     id: 6,
     type: "images",
-    title: "Infinity Relaxation",
-    desc: "Dive into luxury in our crystal clear rooftop pool.",
+    title: "Balcony & Master Suite",
+    desc: "A private balcony with city views, and a spacious master bedroom retreat.",
     url: ["/gallery/DIZ EDEN-133.jpg", "/gallery/DIZ EDEN-111.jpg", "/gallery/DIZ EDEN-142.jpg"],
     span: "md:col-span-2 md:row-span-2 sm:col-span-1 sm:row-span-2 ",
   },
@@ -131,7 +131,7 @@ const Gallery = () => {
               A Gallery of <em className="font-light italic text-gold">Distinction</em>
             </h1>
             <p className="text-cream/60 text-lg max-w-2xl mx-auto leading-relaxed font-light">
-              Explore the meticulous craftsmanship, serene environments, and unparalleled luxury that define the Diz Eden experience.
+              Bedrooms, bathrooms, the kitchen, living areas, and amenities across our 1- and 2-bedroom residences in East Legon, Accra.
             </p>
           </motion.div>
           

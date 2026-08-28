@@ -44,15 +44,9 @@ export default function ExperienceSection() {
             Luxury in every <em className="font-light text-gold">detail</em>
           </h2>
           <p className="mt-6 sm:mt-8 text-lg sm:text-body-xl text-cream leading-relaxed font-light">
-            Every Diz Eden residence is a carefully considered space where
-            thoughtful design meets effortless comfort. We believe luxury is
-            found in the details — from the weight of the linen to the warmth
-            of the welcome.
-          </p>
-          <p className="mt-4 text-body-lg text-cream/80 leading-relaxed font-light">
-            Our commitment is to create an experience that feels both elevated
-            and deeply personal, so that every moment of your stay is one you
-            want to remember.
+            Every stay includes daily housekeeping, premium linens, high-speed
+            Wi-Fi, and a dedicated concierge on call around the clock — the
+            details that make a short stay feel like home.
           </p>
 
           <ul className="mt-8 sm:mt-10 grid gap-3 sm:gap-4 sm:grid-cols-2">
