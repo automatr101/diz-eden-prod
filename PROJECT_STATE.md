@@ -300,6 +300,32 @@ All of the above verified live on `dizeden.com` after each deploy (Vercel auto-d
   expected and intentional, not a bug, if anyone checks admin Overview next
   and sees zeros.
 
+- **Replaced vague AI-sounding homepage copy with concrete details**
+  (commit `2996fc9`). User pointed out via a Google search screenshot that
+  Google was ignoring our `<meta name="description">` entirely and pulling
+  the hero section's tagline instead — "Enter a world where time stands
+  still... a carefully crafted experience of pure, effortless elegance" —
+  i.e. vague enough that even Google's own algorithm didn't trust it as a
+  useful snippet. Compared against how the other listings on the same
+  results page (Instagram, Airbnb, Google's own hotel entity page) wrote
+  theirs: all lead with concrete facts — bedroom count, location, specific
+  amenities — not mood/adjectives. Rewrote to match that pattern, sourcing
+  the amenities from the actual data in `lib/properties.ts` rather than
+  inventing new claims: "Fully furnished 1- and 2-bedroom apartments in
+  East Legon, Accra — king beds, gourmet kitchen, high-speed Wi-Fi, daily
+  housekeeping, and 24/7 security." Applied consistently across four
+  places that had drifted out of sync: `index.html`'s meta/OG/Twitter
+  description tags, `Index.tsx`'s `useDocumentMeta` call (wins after
+  hydration — see Chunk 1 in Completed), and `HeroSection.tsx`'s on-page
+  paragraph (the actual text Google was pulling). Also fixed a factual
+  error caught in the same pass: `og:description` claimed "Three curated
+  luxury residences" — there's one property with two room configurations,
+  not three residences. Verified all four live via curl post-deploy.
+  - **Pattern worth remembering**: a meta description tag existing and
+    looking reasonable doesn't mean Google is using it — always check what
+    Google actually displays (a real search, not just the source tag) before
+    concluding a rewrite fixed anything.
+
 ## Constraints
 
 - **Two separate codebases exist for this client — do not confuse them:**
