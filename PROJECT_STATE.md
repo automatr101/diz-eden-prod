@@ -266,15 +266,39 @@ All of the above verified live on `dizeden.com` after each deploy (Vercel auto-d
   - **Found and deliberately did NOT run** `clear_test_data.mjs` (repo root)
     when asked to check for a "reset script" — it unconditionally deletes
     *all* rows from both `bookings` and `blocked_dates` (every real guest
-    booking, no filtering). Left untouched; flagging here in case anyone
-    considers running it without reading it first.
+    booking, no filtering). Did not run it at the time.
+
+- **Confirmed the site is still on a Paystack TEST key** (`pk_test_...`,
+  verified independently by grepping the live deployed JS bundle, not just
+  taking the user's word for it) — meaning every booking in the database up
+  to this point, including the 7 "real-looking" ones (Alalbila Wisdom,
+  Automatr, James, Allat, Billz, etc.), was dev/test data, not real paying
+  guests. User then explicitly confirmed wanting a full wipe. Ran it via
+  Supabase MCP directly (not the unsafe `clear_test_data.mjs`):
+  `delete from blocked_dates; delete from bookings;` — verified both tables
+  at 0 rows via SQL and live in the admin Overview ("No bookings yet").
+  **`clear_test_data.mjs` is still an unsafe blunt-force script and should
+  not be run as-is even now** — this manual, verified SQL approach is the
+  one that was actually used.
+  - **Forward-looking note**: before assuming any future Paystack checkout
+    completion is a real financial transaction (and therefore off-limits),
+    check whether the deployed key is still `pk_test_` or has become
+    `pk_live_` — don't assume based on past state. Test-mode payments move
+    no real money and are safe to complete for testing; live-mode ones are
+    not and remain covered by the "never execute a real payment" rule.
 
 ## In Progress
 
 - **Awaiting user action, not blocked on code**: (a) add `https://www.dizeden.com`
   as the Website on the "Diz Eden luxury Apartments" Google Business Profile,
-  (b) decide whether/how to pursue backlink-building.
+  (b) decide whether/how to pursue backlink-building, (c) whether/when to
+  switch Paystack from test mode to a live key when ready to accept real
+  payments — worth confirming with the user before that switch, since it's
+  a meaningful operational change.
 - Launch checklist itself is fully complete; nothing left there.
+- **Database is now empty** (0 bookings, 0 blocked_dates) as of this wipe —
+  expected and intentional, not a bug, if anyone checks admin Overview next
+  and sees zeros.
 
 ## Constraints
 
