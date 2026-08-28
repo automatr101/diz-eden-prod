@@ -76,7 +76,7 @@ export default function HeroSection() {
             variants={fadeInUp}
             className="mt-8 sm:mt-10 max-w-md text-body-xl text-cream/70 leading-relaxed drop-shadow-sm"
           >
-            Enter a world where time stands still. Diz Eden is more than a 2-bedroom luxury residence; it's a carefully crafted experience of pure, effortless elegance.
+            Fully furnished 1- and 2-bedroom residences in East Legon, Accra, with king beds, a gourmet kitchen, high-speed Wi-Fi, and daily housekeeping — plus 24/7 security and private parking on site.
           </motion.p>
 
           <motion.div variants={fadeInUp} className="mt-8 sm:mt-12 flex items-center gap-3 sm:gap-8">

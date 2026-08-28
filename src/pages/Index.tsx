@@ -21,7 +21,7 @@ export default function Index() {
 
   useDocumentMeta({
     title: "Diz Eden — Luxury Short-Stay Residences",
-    description: "Experience premium short-term rentals in East Legon, Accra. Diz Eden offers luxury 1 and 2-bedroom serviced apartments tailored for discerning travelers. Book direct today.",
+    description: "Fully furnished 1- and 2-bedroom apartments in East Legon, Accra — king beds, gourmet kitchen, high-speed Wi-Fi, daily housekeeping, and 24/7 security. Book direct.",
     path: "/",
   });
 
