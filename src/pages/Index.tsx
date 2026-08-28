@@ -20,7 +20,7 @@ export default function Index() {
   const [loading, setLoading] = useState(true);
 
   useDocumentMeta({
-    title: "Diz Eden — Luxury Short-Stay Residences",
+    title: "Diz Eden Luxury Apartments — East Legon, Accra",
     description: "Fully furnished 1- and 2-bedroom apartments in East Legon, Accra — king beds, gourmet kitchen, high-speed Wi-Fi, daily housekeeping, and 24/7 security. Book direct.",
     path: "/",
   });

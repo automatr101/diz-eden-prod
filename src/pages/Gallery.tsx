@@ -102,7 +102,7 @@ const mediaItems: MediaItemType[] = [
 
 const Gallery = () => {
   useDocumentMeta({
-    title: "Gallery — Diz Eden Luxury Short-Stay Residences",
+    title: "Gallery — Diz Eden Luxury Apartments",
     description: "Browse photos of Diz Eden's luxury 1 and 2-bedroom serviced apartments in East Legon, Accra — interiors, amenities, and residence details.",
     path: "/gallery",
   });
