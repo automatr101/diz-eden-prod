@@ -347,6 +347,38 @@ All of the above verified live on `dizeden.com` after each deploy (Vercel auto-d
     ("Balcony & Master Suite", the new taglines, the new Experience copy)
     present, old strings ("rooftop pool", "Infinity Relaxation") absent.
 
+- **Fixed search-result title and missing site-name signal** (commit
+  `208bb34`). User compared our Google result against a competitor's
+  (Kempinski) and noticed two things: (1) the competitor shows a
+  friendly brand name ("Kempinski Hotels") on the gray line above the
+  title, ours showed the bare domain "dizeden.com"; (2) our blue title
+  itself, "Diz Eden — Luxury Short-Stay Residences," didn't match the
+  business's actual name on Google Business Profile ("Diz Eden luxury
+  Apartments", the 4.8★/18-review listing).
+  - Title fix: `index.html` `<title>`/`og:title`/`twitter:title`, plus
+    the two client-side overrides that win post-hydration
+    (`Index.tsx`, `Gallery.tsx` via `useDocumentMeta`), all updated to
+    lead with the real brand name + location: "Diz Eden Luxury
+    Apartments — East Legon, Accra". Used Title Case ("Luxury") rather
+    than matching the GBP listing's lowercase "luxury" exactly —
+    capitalization differences don't meaningfully affect Google's NAP
+    matching, but worth knowing this is a minor inconsistency between
+    the GBP listing and the site now.
+  - Site-name fix: added `og:site_name` meta tag and a `WebSite`
+    JSON-LD block to `index.html`, both naming "Diz Eden Luxury
+    Apartments" — this is the documented Google mechanism for
+    controlling what shows on that gray line instead of the bare
+    domain. No structured data existed anywhere on the site before this.
+  - Verified locally via `document.title` / meta tag / JSON-LD reads
+    in the dev preview. `tsc --noEmit` and `vite build` both clean.
+  - **Expect a delay before this is visible in live search results** —
+    same caching lag observed with the meta-description fix (Google
+    was still showing the pre-rewrite hero text days after that commit
+    went live). Don't treat "still shows dizeden.com / old title" a
+    few days out as evidence the fix didn't work — check the live page
+    source/bundle first (as done for the other copy fixes), not the
+    Google result, to confirm what's actually deployed.
+
 ## In Progress
 
 - **Awaiting user action, not blocked on code**: (a) add `https://www.dizeden.com`
