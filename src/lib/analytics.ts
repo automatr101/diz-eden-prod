@@ -98,3 +98,9 @@ export function trackPageview(path: string) {
     page_title: document.title,
   });
 }
+
+/** Fires an arbitrary GA4 event. No-op until cookie consent has loaded analytics. */
+export function trackEvent(name: string, params?: Record<string, unknown>) {
+  if (!analyticsLoaded || typeof window.gtag !== "function") return;
+  window.gtag("event", name, params);
+}

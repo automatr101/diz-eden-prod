@@ -13,6 +13,7 @@ import { useAvailability } from "@/hooks/useAvailability";
 import { DateRange } from "react-day-picker";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { trackEvent } from "@/lib/analytics";
 
 declare global {
   interface Window {
@@ -278,6 +279,11 @@ export default function Booking() {
 
       handler.openIframe();
       tg.bookingStarted({ guestName: form.name, total: totalPesewas / 100, ref }).catch(console.error);
+      trackEvent("begin_checkout", {
+        currency: "GHS",
+        value: totalGHS,
+        items: [{ item_name: `${rooms} Bedroom`, price: basePrice, quantity: nights }],
+      });
     } catch (err: any) {
       console.error("Paystack Error:", err);
       alert("Payment window failed to open. Please try again.");
@@ -385,6 +391,13 @@ export default function Booking() {
       checkIn: format(new Date(checkIn), "dd MMM yyyy"),
       checkOut: format(new Date(checkOut), "dd MMM yyyy"),
       propertyName: apartment.name,
+    });
+
+    trackEvent("purchase", {
+      transaction_id: internalRef,
+      currency: "GHS",
+      value: totalGHS,
+      items: [{ item_name: `${rooms} Bedroom`, price: basePrice, quantity: nights }],
     });
 
     setBookingRef(internalRef);

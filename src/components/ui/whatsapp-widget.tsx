@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { trackEvent } from "@/lib/analytics";
 
 export default function WhatsAppWidget() {
   const whatsappUrl = "https://wa.link/aboffc";
@@ -8,6 +9,7 @@ export default function WhatsAppWidget() {
       href={whatsappUrl}
       target="_blank"
       rel="noopener noreferrer"
+      onClick={() => trackEvent("generate_lead", { method: "whatsapp" })}
       initial={{ scale: 0, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
       whileHover={{ scale: 1.1 }}
