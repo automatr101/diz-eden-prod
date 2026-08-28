@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { format, differenceInCalendarDays } from "date-fns";
-import { Loader2, CheckCircle2, XCircle, Clock, ExternalLink, Plus, X } from "lucide-react";
+import { Loader2, CheckCircle2, XCircle, Clock, ExternalLink, Plus, X, Download } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { emailApi } from "@/lib/emails";
+import { exportToCsv } from "@/lib/csv";
 
 type Booking = {
   id: string;
@@ -297,6 +298,27 @@ export default function BookingsPanel() {
     setUpdating(null);
   };
 
+  const handleExport = () => {
+    exportToCsv(
+      `diz-eden-bookings-${format(new Date(), "yyyy-MM-dd")}.csv`,
+      bookings.map((b) => ({
+        reference: b.booking_reference,
+        status: b.status || "pending",
+        guest_name: b.guest_name,
+        guest_email: b.guest_email,
+        guest_phone: b.guest_phone || "",
+        check_in: b.check_in,
+        check_out: b.check_out,
+        nights: b.num_nights,
+        guests: b.num_guests,
+        nightly_rate: b.nightly_rate,
+        total_amount: b.total_amount,
+        special_requests: b.special_requests || "",
+        created_at: b.created_at || "",
+      }))
+    );
+  };
+
   const openWhatsApp = (booking: Booking) => {
     const phone = booking.guest_phone?.replace(/\D/g, "");
     const msg = `Hi ${booking.guest_name}! Diz Eden here. Your booking (Ref: ${booking.booking_reference}) for ${format(new Date(booking.check_in), "dd MMM")} – ${format(new Date(booking.check_out), "dd MMM yyyy")} is confirmed. Looking forward to hosting you!`;
@@ -335,6 +357,13 @@ export default function BookingsPanel() {
               className="text-xs uppercase tracking-widest text-cream/40 border border-white/10 px-4 py-2 rounded-xl hover:text-white hover:border-white/30 transition-all"
             >
               Refresh
+            </button>
+            <button
+              onClick={handleExport}
+              disabled={bookings.length === 0}
+              className="flex items-center gap-2 text-xs uppercase tracking-widest text-cream/40 border border-white/10 px-4 py-2 rounded-xl hover:text-white hover:border-white/30 transition-all disabled:opacity-30 disabled:pointer-events-none"
+            >
+              <Download size={14} /> Export CSV
             </button>
             <button
               onClick={() => setShowModal(true)}

@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, Star, Eye, EyeOff, Trash2 } from "lucide-react";
+import { Loader2, Star, Eye, EyeOff, Trash2, Download } from "lucide-react";
 import { format } from "date-fns";
+import { exportToCsv } from "@/lib/csv";
 
 type Review = {
   id: string;
@@ -45,6 +46,19 @@ export default function ReviewsPanel() {
   const published = reviews.filter((r) => r.published);
   const unpublished = reviews.filter((r) => !r.published);
 
+  const handleExport = () => {
+    exportToCsv(
+      `diz-eden-reviews-${format(new Date(), "yyyy-MM-dd")}.csv`,
+      reviews.map((r) => ({
+        guest_name: r.guest_name,
+        rating: r.rating,
+        comment: r.comment || "",
+        published: r.published ? "yes" : "no",
+        created_at: r.created_at || "",
+      }))
+    );
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -62,6 +76,13 @@ export default function ReviewsPanel() {
             {published.length} published · {unpublished.length} pending
           </p>
         </div>
+        <button
+          onClick={handleExport}
+          disabled={reviews.length === 0}
+          className="flex items-center gap-2 text-xs uppercase tracking-widest text-cream/40 border border-white/10 px-4 py-2 rounded-xl hover:text-white hover:border-white/30 transition-all disabled:opacity-30 disabled:pointer-events-none"
+        >
+          <Download size={14} /> Export CSV
+        </button>
       </div>
 
       {reviews.length === 0 ? (

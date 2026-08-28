@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  LayoutDashboard, CalendarDays, BookOpen, Star, DollarSign, LogOut, Menu, X,
+  LayoutDashboard, CalendarDays, BookOpen, Star, DollarSign, LogOut, Menu, X, Settings,
 } from "lucide-react";
 import logoImg from "@/assets/diz-eden-logo.jpg";
 import AdminLogin from "./AdminLogin";
@@ -11,10 +11,11 @@ import BookingsPanel from "./BookingsPanel";
 import AvailabilityPanel from "./AvailabilityPanel";
 import PricingPanel from "./PricingPanel";
 import ReviewsPanel from "./ReviewsPanel";
+import SettingsPanel from "./SettingsPanel";
 import { cn } from "@/lib/utils";
 import { useDocumentMeta } from "@/hooks/useDocumentMeta";
 
-type Panel = "dashboard" | "bookings" | "availability" | "pricing" | "reviews";
+type Panel = "dashboard" | "bookings" | "availability" | "pricing" | "reviews" | "settings";
 
 const navItems: { id: Panel; label: string; icon: React.ElementType }[] = [
   { id: "dashboard", label: "Overview", icon: LayoutDashboard },
@@ -22,6 +23,7 @@ const navItems: { id: Panel; label: string; icon: React.ElementType }[] = [
   { id: "availability", label: "Availability", icon: CalendarDays },
   { id: "pricing", label: "Pricing", icon: DollarSign },
   { id: "reviews", label: "Reviews", icon: Star },
+  { id: "settings", label: "Settings", icon: Settings },
 ];
 
 export default function AdminPage() {
@@ -69,6 +71,7 @@ export default function AdminPage() {
     availability: <AvailabilityPanel />,
     pricing: <PricingPanel />,
     reviews: <ReviewsPanel />,
+    settings: <SettingsPanel />,
   };
 
   return (
