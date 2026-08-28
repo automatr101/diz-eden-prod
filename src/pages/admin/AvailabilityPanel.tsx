@@ -55,8 +55,15 @@ export default function AvailabilityPanel() {
 
   const handleDayClick = (day: Date) => {
     if (isBefore(day, new Date()) && !isToday(day)) return;
+    if (getBookingForDate(day)) return; // already unavailable via a real booking — nothing to manually block
     setSelectedDate(day);
   };
+
+  // Rows auto-created when a guest pays for a booking (see Booking.tsx) —
+  // these are tied to that booking's lifecycle, not something an admin
+  // should delete ad hoc. They're released automatically when the booking
+  // is cancelled (BookingsPanel), and are already visible as "Booked" here.
+  const manualBlocks = blockedDates.filter((b) => !b.reason?.startsWith("Booked: "));
 
   const blockDate = async () => {
     if (!selectedDate) return;
@@ -133,8 +140,8 @@ export default function AvailabilityPanel() {
                       aspect-square rounded-xl text-sm font-medium transition-all flex flex-col items-center justify-center gap-0.5
                       ${past ? "opacity-20 cursor-not-allowed" : "cursor-pointer"}
                       ${isSelected ? "ring-2 ring-gold bg-gold/20 text-white" : ""}
-                      ${blocked && !isSelected ? "bg-red-500/20 text-red-400 border border-red-500/30" : ""}
-                      ${booking && !blocked && !isSelected ? "bg-green-500/10 text-green-400 border border-green-500/20" : ""}
+                      ${booking && !isSelected ? "bg-green-500/10 text-green-400 border border-green-500/20" : ""}
+                      ${blocked && !booking && !isSelected ? "bg-red-500/20 text-red-400 border border-red-500/30" : ""}
                       ${!blocked && !booking && !isSelected && !past ? "text-cream/70 hover:bg-white/5 hover:text-white" : ""}
                       ${isToday(day) && !isSelected ? "ring-1 ring-gold/40" : ""}
                     `}
@@ -193,12 +200,15 @@ export default function AvailabilityPanel() {
 
           {/* Blocked dates list */}
           <div className="bg-white/[0.03] border border-white/5 rounded-2xl p-6">
-            <h3 className="text-white font-semibold mb-4">Blocked Dates ({blockedDates.length})</h3>
-            {blockedDates.length === 0 ? (
-              <p className="text-cream/30 text-sm">No dates blocked.</p>
+            <h3 className="text-white font-semibold mb-1">Blocked Dates ({manualBlocks.length})</h3>
+            <p className="text-cream/40 text-xs mb-4">
+              Manual blocks only — dates from guest bookings are shown in green on the calendar and managed by cancelling the booking in Bookings.
+            </p>
+            {manualBlocks.length === 0 ? (
+              <p className="text-cream/30 text-sm">No dates manually blocked.</p>
             ) : (
               <div className="space-y-2 max-h-72 overflow-y-auto">
-                {blockedDates
+                {manualBlocks
                   .sort((a, b) => a.date.localeCompare(b.date))
                   .map((bd) => (
                     <div key={bd.id} className="flex items-center justify-between bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-2.5">

@@ -273,7 +273,17 @@ export default function BookingsPanel() {
   const updateStatus = async (booking: Booking, status: string) => {
     setUpdating(booking.id);
     await supabase.from("bookings").update({ status }).eq("id", booking.id);
-    
+
+    // Cancelling a booking must release the dates it auto-blocked when paid
+    // for, or they stay unbookable forever with no way for a guest to
+    // rebook them. See PROJECT_STATE.md for the full story.
+    if (status === "cancelled") {
+      await supabase
+        .from("blocked_dates")
+        .delete()
+        .eq("reason", `Booked: ${booking.booking_reference}`);
+    }
+
     // Auto-fire cancellation emails
     if (status === "cancelled" && booking.guest_email) {
       await emailApi.sendCancellation({
@@ -282,7 +292,7 @@ export default function BookingsPanel() {
         bookingRef: booking.booking_reference,
       });
     }
-    
+
     await fetchBookings();
     setUpdating(null);
   };
