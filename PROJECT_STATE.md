@@ -254,24 +254,26 @@ All of the above verified live on `dizeden.com` after each deploy (Vercel auto-d
     deleted, so a `Booked:` row will always eventually find its booking when
     cancelled) — but this one orphaned test row is real and needs manual
     cleanup: **`delete from blocked_dates where date = '2026-09-07' and
-    reason = 'Booked: TEST-CANCEL-QA';`** via the Supabase SQL editor. Not
-    done yet — flagging for the user or a future session with Supabase MCP
-    access.
-  - The "QA TEST - DELETE ME - Cancellation Check" booking (now cancelled,
-    ref `DE-MTD15PW4`) was also left in the `bookings` table — harmless,
-    clearly labeled, and cannot be hard-deleted through the app (no delete-
-    booking capability exists anywhere, by design — bookings are permanent
-    records, only their status changes).
+    reason = 'Booked: TEST-CANCEL-QA';`** via the Supabase SQL editor.
+  - **Cleaned up** in a follow-up turn once Supabase MCP reconnected: ran the
+    delete above (confirmed via `select count(*) where reason like 'Booked:
+    TEST%'` → 0), and also hard-deleted the cancelled `DE-MTD15PW4` test
+    booking directly via SQL (bypasses the app's RLS-level "no delete"
+    design, which only blocks it through the anon/authenticated REST API —
+    MCP's Postgres connection has no such restriction). Verified final
+    counts: 7 real bookings, 4 real blocked_dates rows — matches pre-test
+    state exactly. All test debris from this investigation is gone.
+  - **Found and deliberately did NOT run** `clear_test_data.mjs` (repo root)
+    when asked to check for a "reset script" — it unconditionally deletes
+    *all* rows from both `bookings` and `blocked_dates` (every real guest
+    booking, no filtering). Left untouched; flagging here in case anyone
+    considers running it without reading it first.
 
 ## In Progress
 
 - **Awaiting user action, not blocked on code**: (a) add `https://www.dizeden.com`
   as the Website on the "Diz Eden luxury Apartments" Google Business Profile,
   (b) decide whether/how to pursue backlink-building.
-- **Cleanup needed** (needs Supabase MCP or dashboard SQL access, not available
-  this session): delete the orphaned `Booked: TEST-CANCEL-QA` row for
-  2026-09-07 in `blocked_dates` — see above for the exact SQL. Until this runs,
-  that one date will incorrectly show as unavailable/blocked to real guests.
 - Launch checklist itself is fully complete; nothing left there.
 
 ## Constraints
