@@ -287,19 +287,6 @@ All of the above verified live on `dizeden.com` after each deploy (Vercel auto-d
     no real money and are safe to complete for testing; live-mode ones are
     not and remain covered by the "never execute a real payment" rule.
 
-## In Progress
-
-- **Awaiting user action, not blocked on code**: (a) add `https://www.dizeden.com`
-  as the Website on the "Diz Eden luxury Apartments" Google Business Profile,
-  (b) decide whether/how to pursue backlink-building, (c) whether/when to
-  switch Paystack from test mode to a live key when ready to accept real
-  payments — worth confirming with the user before that switch, since it's
-  a meaningful operational change.
-- Launch checklist itself is fully complete; nothing left there.
-- **Database is now empty** (0 bookings, 0 blocked_dates) as of this wipe —
-  expected and intentional, not a bug, if anyone checks admin Overview next
-  and sees zeros.
-
 - **Replaced vague AI-sounding homepage copy with concrete details**
   (commit `2996fc9`). User pointed out via a Google search screenshot that
   Google was ignoring our `<meta name="description">` entirely and pulling
@@ -325,6 +312,57 @@ All of the above verified live on `dizeden.com` after each deploy (Vercel auto-d
     looking reasonable doesn't mean Google is using it — always check what
     Google actually displays (a real search, not just the source tag) before
     concluding a rewrite fixed anything.
+
+- **Extended the copy cleanup to the rest of the site, and caught a
+  false-advertising issue** (commit `44eeea2`), per the follow-up "check
+  the other pages for the same issue":
+  - `lib/properties.ts` — both apartment taglines/descriptions rewritten
+    from mood language ("Intimate Elegance", "Sophisticated Sanctuary")
+    to concrete facts (bed count, location, real amenities). This is the
+    single source of truth consumed by `PropertyDetail.tsx` (`/about`)
+    and `PropertyCard.tsx`, so the fix propagated to both automatically.
+  - `Gallery.tsx` — intro paragraph rewritten to concrete facts.
+  - **False-advertising catch**: while grep-scanning for vague/superlative
+    language, found a gallery tile ("Infinity Relaxation") claiming a
+    "crystal clear rooftop pool" — a real amenity that does not exist on
+    the property. Verified against the actual photos in that tile
+    (`DIZ EDEN-133/111/142.jpg` — balcony, bedroom lounge, master bedroom;
+    no pool visible in any of them). Flagged to the user before touching
+    it; user confirmed **"no pool, the rest is okay"** — i.e. remove the
+    pool claim specifically, leave the adjacent "Wellness & Spa" tile
+    (fitness/spa facilities) unchanged since that one's real. Rewrote the
+    pool tile to "Balcony & Master Suite" describing what the photos
+    actually show.
+  - `ExperienceSection.tsx` — collapsed two vague filler paragraphs into
+    one paragraph naming real amenities (daily housekeeping, premium
+    linens, high-speed Wi-Fi, concierge) already listed in the same
+    section's amenities list, so the prose and the list now agree.
+  - Left `GallerySection.tsx` untouched — has the same slop language
+    ("Master Suite Sanctuary", "Wellness Sanctuary", etc.) but confirmed
+    via grep to be dead code, not imported anywhere. Out of scope.
+  - Verified: `tsc --noEmit` clean (only the pre-existing, unrelated
+    `BookingBar.tsx` framer-motion error present throughout this whole
+    session), `vite build` clean, and confirmed live post-deploy by
+    downloading the live JS bundle and grepping it directly — new strings
+    ("Balcony & Master Suite", the new taglines, the new Experience copy)
+    present, old strings ("rooftop pool", "Infinity Relaxation") absent.
+
+## In Progress
+
+- **Awaiting user action, not blocked on code**: (a) add `https://www.dizeden.com`
+  as the Website on the "Diz Eden luxury Apartments" Google Business Profile,
+  (b) decide whether/how to pursue backlink-building, (c) whether/when to
+  switch Paystack from test mode to a live key when ready to accept real
+  payments — worth confirming with the user before that switch, since it's
+  a meaningful operational change.
+- Launch checklist itself is fully complete; nothing left there.
+- **Database is now empty** (0 bookings, 0 blocked_dates) as of this wipe —
+  expected and intentional, not a bug, if anyone checks admin Overview next
+  and sees zeros.
+- No further copy-cleanup requests outstanding — this batch plus the
+  homepage batch above cover every AI-slop/factual-accuracy issue raised
+  so far. Don't proactively hunt for more copy to rewrite without the
+  user flagging something new.
 
 ## Constraints
 
