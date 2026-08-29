@@ -32,7 +32,7 @@ declare global {
   }
 }
 
-import { apartment, apartment1BR, apartment2BR } from "@/lib/properties";
+import { apartment1BR, apartment2BR } from "@/lib/properties";
 import { useDocumentMeta } from "@/hooks/useDocumentMeta";
 
 type Step = "details" | "payment" | "confirmed";
@@ -75,6 +75,7 @@ export default function Booking() {
   const [guests, setGuests] = useState(initGuests);
   const [rooms, setRooms] = useState<1 | 2>(initRooms);
   const maxGuests = rooms === 2 ? apartment2BR.maxGuests : apartment1BR.maxGuests;
+  const selectedApartment = rooms === 2 ? apartment2BR : apartment1BR;
 
   // Clamp guest count when the apartment type changes to a smaller unit
   useEffect(() => {
@@ -390,7 +391,7 @@ export default function Booking() {
       bookingRef: internalRef,
       checkIn: format(new Date(checkIn), "dd MMM yyyy"),
       checkOut: format(new Date(checkOut), "dd MMM yyyy"),
-      propertyName: apartment.name,
+      propertyName: selectedApartment.name,
     });
 
     trackEvent("purchase", {
@@ -432,7 +433,7 @@ export default function Booking() {
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-cream/50">Property</span>
-                <span className="text-white">{apartment.name}</span>
+                <span className="text-white">{selectedApartment.name}</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-cream/50">Check-in</span>
@@ -662,8 +663,8 @@ export default function Booking() {
                 <h3 className="text-white font-semibold mb-5">Booking Summary</h3>
 
                 <img
-                  src={apartment.image}
-                  alt={apartment.name}
+                  src={selectedApartment.image}
+                  alt={selectedApartment.name}
                   className="w-full h-40 object-cover rounded-2xl mb-5 border border-white/5"
                 />
 
