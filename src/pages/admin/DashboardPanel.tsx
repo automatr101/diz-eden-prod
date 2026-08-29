@@ -2,6 +2,13 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2, CalendarCheck, Users, Star, TrendingUp } from "lucide-react";
 import { format, subDays, isAfter } from "date-fns";
+import { CartesianGrid, Line, LineChart, XAxis, YAxis } from "recharts";
+import { Card, CardContent } from "@/components/ui/card";
+import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+
+const revenueChartConfig = {
+  revenue: { label: "Revenue (GH₵)", color: "hsl(var(--color-gold))" },
+} satisfies ChartConfig;
 
 type Booking = {
   id: string;
@@ -34,6 +41,15 @@ export default function DashboardPanel() {
   const totalRevenue = confirmed.reduce((sum, b) => sum + b.total_amount, 0);
   const recentBookings = bookings.slice(0, 5);
   const thisWeek = bookings.filter((b) => b.created_at && isAfter(new Date(b.created_at), subDays(new Date(), 7)));
+
+  // Revenue by stay date (check-in), confirmed bookings only
+  const revenueByDate = confirmed.reduce((acc, b) => {
+    acc[b.check_in] = (acc[b.check_in] || 0) + b.total_amount;
+    return acc;
+  }, {} as Record<string, number>);
+  const revenueChartData = Object.entries(revenueByDate)
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([date, revenue]) => ({ date: format(new Date(date), "MMM d"), revenue }));
 
   const stats = [
     {
@@ -94,6 +110,52 @@ export default function DashboardPanel() {
             <p className="text-[10px] uppercase tracking-widest text-cream/40 mt-1 font-bold">{label}</p>
           </div>
         ))}
+      </div>
+
+      {/* Revenue trend */}
+      <div>
+        <h3 className="text-white font-semibold text-sm uppercase tracking-widest mb-4">Revenue Trend</h3>
+        {revenueChartData.length === 0 ? (
+          <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-10 text-center">
+            <p className="text-cream/30 text-sm">No confirmed bookings yet — the chart fills in as revenue comes in.</p>
+          </div>
+        ) : (
+          <Card className="bg-white/[0.03] border-white/5">
+            <CardContent className="pt-6">
+              <ChartContainer config={revenueChartConfig} className="h-64 w-full">
+                <LineChart data={revenueChartData} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="4 8" stroke="hsl(var(--border))" vertical={false} />
+                  <XAxis
+                    dataKey="date"
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }}
+                    tickMargin={10}
+                  />
+                  <YAxis
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }}
+                    tickFormatter={(value) => `₵${value.toLocaleString()}`}
+                    width={56}
+                  />
+                  <ChartTooltip
+                    content={<ChartTooltipContent indicator="dot" />}
+                    cursor={{ stroke: "hsl(var(--border))", strokeDasharray: "3 3" }}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="revenue"
+                    stroke="var(--color-revenue)"
+                    strokeWidth={2}
+                    dot={{ r: 3, fill: "var(--color-revenue)" }}
+                    activeDot={{ r: 5 }}
+                  />
+                </LineChart>
+              </ChartContainer>
+            </CardContent>
+          </Card>
+        )}
       </div>
 
       {/* Recent bookings */}
