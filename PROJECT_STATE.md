@@ -547,6 +547,64 @@ All of the above verified live on `dizeden.com` after each deploy (Vercel auto-d
     --noEmit` and `vite build` both clean, new bundle hash confirmed
     live on `dizeden.com/booking`.
 
+- **Added a working revenue chart to the admin Dashboard** (commit
+  `7e09d13`). User asked to integrate a shadcn line-chart component,
+  with instructions to copy-paste several files, install npm
+  dependencies, and extend the Tailwind config. Checked what this
+  project already had before doing any of that literally:
+  - Already a fully-configured shadcn project (`components.json`, TS,
+    Tailwind 3.4) with `recharts`, `class-variance-authority`, and
+    `lucide-react` already installed — **no new npm dependencies were
+    needed**.
+  - `src/components/ui/chart.tsx` already existed and is functionally
+    identical to the requested chart file (same `ChartContainer`/
+    `ChartTooltip`/`ChartConfig` primitives) — reused it instead of
+    adding a duplicate.
+  - `src/components/ui/card.tsx` already exports the plain
+    `Card`/`CardContent` the chart needs — deliberately did **not**
+    overwrite it with the more elaborate variant-based `Card` from the
+    request, since that would touch every other place `Card` is
+    already used across the live site.
+  - Skipped the requested `Button`/`Badge`/`Avatar` "dependency" file
+    replacements entirely — the chart doesn't actually import them,
+    and swapping this project's existing versions for
+    differently-designed ones site-wide was never actually necessary.
+  - Skipped the provided Tailwind v4 `@theme` CSS block — this project
+    is Tailwind 3, and every color token it referenced (`border`,
+    `input`, `muted-foreground`, `popover`, `background`) already
+    exists in `src/index.css`.
+  - **What actually shipped**: a real "Revenue Trend" line chart on
+    the admin Dashboard/Overview panel (previously just stat cards, no
+    charts anywhere in the app) — daily revenue summed from confirmed
+    bookings' check-in dates, rendered in the site's actual gold brand
+    color (`hsl(var(--color-gold))`), with a proper empty state
+    instead of a blank chart when there's no confirmed-booking data.
+  - **Verified with real data, not just a clean build**: seeded 3
+    confirmed test bookings via the Bookings panel's "Log Booking"
+    modal (₵2,400 / ₵2,400 / ₵3,600 on different check-in dates — this
+    modal has no Telegram/email side effects, confirmed earlier this
+    session), zoomed into the live Dashboard chart and saw exactly the
+    right line: flat at ₵2,400 for the first two points, rising to
+    ₵3,600 for the third, axis labels ₵0–₵3,600 matching the data,
+    stat cards correctly totaling 3 bookings / 8,400 revenue. Deleted
+    all 3 via the Settings panel's type-to-confirm flow afterward;
+    confirmed via SQL both `bookings` and `blocked_dates` are back to
+    `0` rows.
+  - **Testing-tooling note**: hit the same false-alarm pattern as the
+    earlier Settings-panel test — clicking a sidebar nav button
+    sometimes left the header/nav-highlight showing the new panel
+    while `<main>` still displayed the old panel's content, both via
+    full-page screenshot and via direct `document.querySelector(
+    'main').innerText`. Root cause this time, confirmed via
+    `document.visibilityState`: the automated browser tab was
+    **backgrounded** (`"hidden"`), which pauses `requestAnimationFrame`
+    and stalls the Framer Motion `AnimatePresence` panel-switch
+    transition indefinitely — not a site bug. Taking a `computer`
+    screenshot (which brings the tab to the foreground) and then
+    waiting resolves it every time. Also re-confirmed `get_page_text`
+    on this app is unreliable mid-transition — a zoomed screenshot is
+    the trustworthy check, same lesson as the Settings-panel test.
+
 ## In Progress
 
 - **GA4 key-event configuration is blocked pending access approval.**
