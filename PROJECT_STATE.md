@@ -495,6 +495,58 @@ All of the above verified live on `dizeden.com` after each deploy (Vercel auto-d
     clean build + live bundle grep instead, consistent with how every
     other admin-panel change this session has been verified.
 
+- **Live end-to-end test of the new export/delete admin features, plus a
+  real bug found and fixed along the way** (commit `94d5f03`). User
+  asked to "test book and delete in admin" — a full round-trip test of
+  the CSV export / manual-deletion work from the previous phase, not
+  just a code review.
+  - **Book**: confirmed the live Paystack key was still `pk_test_...`
+    (safe — no real money moves), then went through the actual public
+    `/booking` flow on `dizeden.com` for a 1-Bedroom, 15–17 Sep 2026,
+    using Paystack's built-in test-card simulator ("Success" outcome).
+    Booking landed correctly: `status: confirmed`, ref `DE-MTDMH3EC`,
+    both nights auto-blocked in `blocked_dates`, showed up immediately
+    in the admin Overview (1 total booking, GH₵2,400 revenue) and in
+    the new Settings panel's search.
+  - **Delete**: in `Admin → Settings → Danger Zone`, searched for the
+    test booking and hit Delete. Verified the type-to-confirm safety
+    check actually works before trusting it — typed a wrong reference
+    first and confirmed the Delete button stayed disabled
+    (`btn.disabled === true`), then typed the exact reference and
+    confirmed it enabled (`false`). After deleting: booking row gone,
+    both `blocked_dates` rows gone (checked directly via SQL — both
+    counts `0`), admin Overview back to a clean 0/0/0/0 state.
+  - **Testing-tooling note, not a site bug**: full-page screenshots of
+    the Settings panel came back completely blank on first look — no
+    console errors, but also no visible content, which looked like a
+    real rendering bug at first. Cross-checked with computed styles
+    (`opacity: 1`, `display: block/flex`, fully visible), the
+    accessibility tree, and `get_page_text` — all showed the content
+    was actually there and correctly styled. A *zoomed* screenshot of
+    the same region rendered it perfectly. Conclusion: this was a glitch
+    in the full-page screenshot capture itself, not the page. Worth
+    remembering next time a panel "renders blank" in a screenshot —
+    cross-check with computed styles/`get_page_text` before concluding
+    it's a real bug.
+  - **Real bug found and fixed**: the booking confirmation screen,
+    confirmation email, and booking-summary image all used the static
+    `apartment` export from `lib/properties.ts` (hardcoded to
+    `apartment2BR` — see the Decisions Made note on this being the
+    known source-of-truth export). Booking a 1-Bedroom still produced
+    a confirmation reading "Diz Eden 2-Bedroom Luxury Residence" — the
+    property name never actually reflected which room type was booked.
+    This means every real 1-Bedroom guest booked before this fix
+    received a confirmation email with the wrong property name. Fixed
+    in `Booking.tsx` by computing `selectedApartment` from the actual
+    `rooms` state (`rooms === 2 ? apartment2BR : apartment1BR`, the
+    same ternary pattern already used for `maxGuests`/`basePrice`
+    elsewhere in the same file) and using it in all three places;
+    removed the now-unused `apartment` import. Verified in the dev
+    preview: 1BR shows "Diz Eden 1-Bedroom Luxury Suite", switching to
+    2BR updates live to "Diz Eden 2-Bedroom Luxury Residence". `tsc
+    --noEmit` and `vite build` both clean, new bundle hash confirmed
+    live on `dizeden.com/booking`.
+
 ## In Progress
 
 - **GA4 key-event configuration is blocked pending access approval.**
