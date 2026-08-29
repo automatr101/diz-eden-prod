@@ -446,6 +446,55 @@ All of the above verified live on `dizeden.com` after each deploy (Vercel auto-d
     - `tsc --noEmit` and `vite build` both clean (same pre-existing
       unrelated `BookingBar` error as always).
 
+- **CSV export and manual booking deletion added to admin dashboard**
+  (commit `f34566e`). User asked for two things: "database access to
+  export data like bookings, etc" and "a settings page to remove
+  bookings manually."
+  - `src/lib/csv.ts` — generic `exportToCsv()` helper (builds a CSV
+    Blob client-side, triggers a browser download). Needed no new DB
+    permissions — SELECT was already available to authenticated admins,
+    this just formats what's already fetched. Wired into both the
+    Bookings and Reviews panels as an "Export CSV" button next to
+    Refresh.
+  - New **Settings panel** (`src/pages/admin/SettingsPanel.tsx`, new
+    nav item) with a "Danger Zone" section: search bookings by
+    reference or guest name, delete permanently. Deleting a booking
+    also clears its matching `blocked_dates` row (`reason = "Booked:
+    {ref}"`) — same fix as cancellation in `BookingsPanel.tsx` — so a
+    deleted booking's dates don't get stuck blocked forever with no
+    visible record of why (the exact orphan-row edge case found during
+    live cancellation testing earlier this session).
+  - **Security step per explicit user request**: "you have to input
+    password or type a phrase in order to delete." Implemented as
+    type-the-exact-booking-reference-to-confirm — the Delete button
+    stays disabled until the typed text matches the booking's
+    reference exactly. Chosen over a plain `window.confirm()` (which
+    `ReviewsPanel.tsx`'s existing delete uses) specifically because
+    hard-deleting a financial record deserves the extra friction, and
+    because typing the reference forces the admin to actually look at
+    which booking they're about to remove, not just click through a
+    generic dialog.
+  - **Required a schema change, held for explicit confirmation**:
+    checked `pg_policies` first — `blocked_dates`, `reviews`, and
+    `settings` all already had an "authenticated can delete" RLS
+    policy; `bookings` was the one table with no DELETE policy at all
+    (INSERT for anonymous, SELECT/UPDATE for authenticated only, no
+    DELETE grant to anyone). Attempted the migration via Supabase MCP;
+    **Claude Code's auto-mode classifier blocked it** as a direct
+    schema change to a live production database. Explained exactly
+    what the policy would do and why to the user, who confirmed along
+    with the type-to-confirm requirement above; applied the identical
+    DELETE-for-authenticated policy pattern already used on the other
+    three tables (migration `add_bookings_delete_policy`).
+  - Verified live: new bundle hash deployed, contains "Export CSV",
+    "Danger Zone", "Delete Permanently", "Delete a Booking" strings.
+    `tsc --noEmit` and `vite build` both clean (same pre-existing
+    unrelated `BookingBar` error as always). **Could not visually
+    verify the new admin UI** — no admin login credentials available
+    to the assistant (see Constraints) — relied on source review +
+    clean build + live bundle grep instead, consistent with how every
+    other admin-panel change this session has been verified.
+
 ## In Progress
 
 - **GA4 key-event configuration is blocked pending access approval.**
