@@ -605,7 +605,78 @@ All of the above verified live on `dizeden.com` after each deploy (Vercel auto-d
     on this app is unreliable mid-transition — a zoomed screenshot is
     the trustworthy check, same lesson as the Settings-panel test.
 
+- **Telegram booking notifications now include tap-to-message buttons**
+  (commit `de6f76a`). User wanted to message a guest directly from the
+  Telegram alert, since it previously only ever pushed one-way
+  notifications with no way to act on them.
+  - `supabase/functions/send-telegram/index.ts` now accepts an
+    optional `buttons` array and attaches it as a Telegram inline
+    keyboard. This endpoint has no JWT verification (it's called
+    anonymously from the public checkout flow), so treated the input
+    as untrusted: `https://` URLs only, capped at 3 buttons, text/url
+    length capped. Redeployed (v20/v21), `verify_jwt` kept `false` to
+    match its existing design.
+  - `src/lib/telegram.ts`'s `tg.newBooking()` now attaches two
+    buttons: a WhatsApp deep link (prefilled greeting) and a Telegram
+    `t.me/+<phone>` contact-lookup link (best-effort — only resolves
+    if the guest's Telegram account uses that number and hasn't hidden
+    it in privacy settings; no prefilled-text support for this link
+    type, that's a Telegram limitation not something fixable here).
+    Deliberately **not** added to `newContactForm` — that flow passes
+    the guest's *email* into the field literally named `phone` (a
+    pre-existing mislabel in the contact form code), so a WhatsApp/
+    Telegram link built from it would just be broken.
+  - **Real bug found and fixed while building this**: guest phone
+    numbers are stored in local Ghana format (e.g. `0545266202`), but
+    both wa.me and t.me deep links need full international format
+    with no leading zero (e.g. `233545266202`) to resolve at all. The
+    existing "Message Guest" WhatsApp button in the admin Bookings
+    panel had this exact bug (plain digit-strip only, no country-code
+    handling) and would have silently failed to open the right chat
+    for most guests. Added `src/lib/phone.ts`'s `toIntlPhone()` and
+    used it in both the new Telegram buttons and the existing admin
+    button.
+  - Verified: real end-to-end test send via curl straight to the live
+    edge function (`{"ok":true}` back from Telegram — the test message
+    with a working button actually landed in the client's Telegram),
+    phone conversion independently verified against a real guest's
+    stored number, `tsc --noEmit`/`vite build` clean, new bundle hash
+    live on `dizeden.com` with both button labels present.
+
+- **🔴 Live, unresolved business issue found mid-session — a real
+  guest checked in without actually paying.** While testing the
+  Telegram buttons, queried the most recent real booking and found:
+  **Henry Boateng, ref `DE-MTHF80V4`, GH₵1,200, check-in 2026-08-31
+  (same day it was booked), status "confirmed."** Paystack is still on
+  the test key (`pk_test_...` — see the GA4/other entries above for
+  when this was first flagged), and Paystack's test mode always
+  reports checkout success regardless of the card used, so **this
+  booking never actually charged a real card** — the guest almost
+  certainly has no idea anything is unusual. This was surfaced to the
+  user directly in chat with the corrected WhatsApp link ready to use;
+  **as of this entry, neither of the two required decisions has been
+  confirmed done**:
+  1. How to actually collect payment from Henry before/at check-in
+     (cash, MoMo, bank transfer — the user's call, not something to
+     assume or execute unprompted).
+  2. When to switch Paystack from the test key to a live key — needs
+     the user's own Paystack account verified for live mode and their
+     live publishable key; cannot be done by the assistant, only
+     applied once the user provides it.
+  **A future session should check whether these were resolved before
+  assuming this is closed** — don't treat this as done just because
+  it's logged here.
+
 ## In Progress
+
+- **🔴 URGENT — check this first**: real guest Henry Boateng (booking
+  `DE-MTHF80V4`, GH₵1,200, check-in 2026-08-31) paid through Paystack's
+  test key, so no real money was charged despite the booking showing
+  "confirmed." Two pending decisions, both the user's to make: how to
+  collect real payment from Henry, and when to switch Paystack to a
+  live key (needs the user's own live publishable key). Full writeup
+  in Completed under "Live, unresolved business issue." Do not assume
+  this is resolved — verify with the user first.
 
 - **GA4 key-event configuration is blocked pending access approval.**
   Cannot mark `purchase` as a Key Event, clean up the dead stub events
@@ -620,10 +691,9 @@ All of the above verified live on `dizeden.com` after each deploy (Vercel auto-d
 
 - **Awaiting user action, not blocked on code**: (a) add `https://www.dizeden.com`
   as the Website on the "Diz Eden luxury Apartments" Google Business Profile,
-  (b) decide whether/how to pursue backlink-building, (c) whether/when to
-  switch Paystack from test mode to a live key when ready to accept real
-  payments — worth confirming with the user before that switch, since it's
-  a meaningful operational change.
+  (b) decide whether/how to pursue backlink-building, (c) the Paystack
+  live-key switch above is now urgent, not just "whenever ready" — a real
+  guest already slipped through on the test key.
 - Launch checklist itself is fully complete; nothing left there.
 - **Database is now empty** (0 bookings, 0 blocked_dates) as of this wipe —
   expected and intentional, not a bug, if anyone checks admin Overview next
