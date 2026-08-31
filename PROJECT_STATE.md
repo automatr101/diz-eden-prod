@@ -667,6 +667,38 @@ All of the above verified live on `dizeden.com` after each deploy (Vercel auto-d
   assuming this is closed** — don't treat this as done just because
   it's logged here.
 
+- **Real Telegram bot commands** (commit `d1a0919`). User wanted the
+  bot to be "more productive," not just push one-way notifications —
+  it previously had no way to receive anything typed to it at all (no
+  webhook, no command handling).
+  - New edge function `supabase/functions/telegram-webhook/index.ts`,
+    registered as the bot's Telegram webhook. Responds to `/today`
+    (arrivals/departures today), `/bookings` (next 5 upcoming confirmed
+    bookings), `/revenue` (all-time confirmed revenue — deliberately
+    uses the exact same definition as the admin Overview stat card so
+    the numbers never disagree), and `/help`/`/start`.
+  - Security: only ever acts on messages where `chat.id` matches the
+    existing `TELEGRAM_CHAT_ID` secret — no new secret needed, anyone
+    else who messages the bot is silently ignored.
+  - Self-registers via a `GET ?action=register` route that calls
+    Telegram's `setWebhook` + `setMyCommands` using the function's own
+    env-available bot token — the assistant never needed to see the
+    actual token. Ran once after deploy; Telegram confirmed both
+    (`{"ok":true}`).
+  - **Not yet confirmed working by the user** — ran the registration
+    call and got `ok:true` from Telegram's API, but that only confirms
+    the webhook was *accepted*, not that commands actually reply
+    correctly in practice (couldn't self-test without knowing the real
+    chat ID). Asked the user to try `/help` and the others; no
+    confirmation received yet in this session. **Check with the user
+    before assuming this works** — if it's broken, check
+    `query_logs` on `telegram-webhook` first.
+  - Same open question for the WhatsApp/Telegram reply buttons from
+    the previous phase (`de6f76a`) — a live test send returned
+    `{"ok":true}` from Telegram, but whether tapping the buttons
+    actually opened the right chat was never confirmed by the user
+    either.
+
 ## In Progress
 
 - **🔴 URGENT — check this first**: real guest Henry Boateng (booking
@@ -751,6 +783,20 @@ All of the above verified live on `dizeden.com` after each deploy (Vercel auto-d
   email for now rather than publish the personal Gmail found in `settings.owner_email`.
   Footer/contact section still show phone + WhatsApp only. Revisit if the user provides
   a branded address later.
+- **Bot-identity guest messaging: keeping the current click-to-open-your-own-app
+  buttons, not pursuing true bot-sent messages.** User asked whether the Telegram
+  bot could message guests *as the bot* (not as the owner's personal contact).
+  Explained the platform realities: Telegram bots categorically cannot message a
+  user who hasn't first started a chat with the bot (guests never have, so this is
+  a hard platform restriction, not a code limitation); WhatsApp could do this via
+  the WhatsApp Business Platform (Cloud API), but that needs a verified Meta
+  Business account, a dedicated business phone number, and Meta-approved message
+  templates for cold-messaging — external setup on the user's end, not something
+  buildable from this repo. User chose to keep the existing WhatsApp/Telegram
+  deep-link buttons (open the owner's own app, guest sees the real business
+  contact) rather than start that process. **Revisit only if the user explicitly
+  says they've set up a Meta Business / WhatsApp Business Platform account** —
+  don't propose this again unprompted.
 
 ---
 
