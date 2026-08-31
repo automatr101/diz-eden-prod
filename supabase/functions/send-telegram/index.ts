@@ -27,7 +27,7 @@ serve(async (req) => {
       );
     }
 
-    const { message } = await req.json();
+    const { message, buttons } = await req.json();
 
     if (!message || typeof message !== "string") {
       return new Response(
@@ -39,16 +39,34 @@ serve(async (req) => {
     // ─── SECURITY: Limit message length to prevent abuse ───
     const sanitizedMessage = message.slice(0, 4000);
 
+    // ─── SECURITY: Only allow https:// button URLs, cap count/length ───
+    // This endpoint has no JWT verification (see deploy comment above), so
+    // treat all input as untrusted even though only our own client calls it.
+    const safeButtons = Array.isArray(buttons)
+      ? buttons
+          .filter(
+            (b): b is { text: string; url: string } =>
+              b && typeof b.text === "string" && typeof b.url === "string" && b.url.startsWith("https://")
+          )
+          .slice(0, 3)
+          .map((b) => ({ text: b.text.slice(0, 64), url: b.url.slice(0, 512) }))
+      : [];
+
+    const payload: Record<string, unknown> = {
+      chat_id: CHAT_ID,
+      text: sanitizedMessage,
+      parse_mode: "HTML",
+    };
+    if (safeButtons.length > 0) {
+      payload.reply_markup = { inline_keyboard: [safeButtons.map((b) => ({ text: b.text, url: b.url }))] };
+    }
+
     const tgResponse = await fetch(
       `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          chat_id: CHAT_ID,
-          text: sanitizedMessage,
-          parse_mode: "HTML",
-        }),
+        body: JSON.stringify(payload),
       }
     );
 

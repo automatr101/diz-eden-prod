@@ -5,6 +5,7 @@ import { Loader2, CheckCircle2, XCircle, Clock, ExternalLink, Plus, X, Download 
 import { cn } from "@/lib/utils";
 import { emailApi } from "@/lib/emails";
 import { exportToCsv } from "@/lib/csv";
+import { toIntlPhone } from "@/lib/phone";
 
 type Booking = {
   id: string;
@@ -320,7 +321,7 @@ export default function BookingsPanel() {
   };
 
   const openWhatsApp = (booking: Booking) => {
-    const phone = booking.guest_phone?.replace(/\D/g, "");
+    const phone = booking.guest_phone ? toIntlPhone(booking.guest_phone) : "";
     const msg = `Hi ${booking.guest_name}! Diz Eden here. Your booking (Ref: ${booking.booking_reference}) for ${format(new Date(booking.check_in), "dd MMM")} – ${format(new Date(booking.check_out), "dd MMM yyyy")} is confirmed. Looking forward to hosting you!`;
     const url = phone
       ? `https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(msg)}`
