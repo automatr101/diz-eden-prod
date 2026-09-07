@@ -757,6 +757,36 @@ All of the above verified live on `dizeden.com` after each deploy (Vercel auto-d
     bundle hash, "Book via WhatsApp" string present, Paystack script
     tag confirmed gone from served HTML.
 
+- **Post-deploy health check on the live admin dashboard, plus a full
+  live (not just dev-preview) end-to-end test of the WhatsApp booking
+  flow.** User asked to check the admin dashboard and then test the
+  new flow live on `dizeden.com` itself.
+  - Admin check: Overview stats (1 booking, 1 confirmed stay, GH₵1,200
+    revenue), the Revenue Trend chart (single point at Aug 31 matching
+    Henry's booking), Recent Reservations, and the Availability
+    calendar were all internally consistent with the one real booking
+    in the database. Notably, Aug 31 correctly rendered green
+    ("Booked") with Henry's name on the calendar **despite his booking
+    having zero `blocked_dates` rows** (it predates the RLS fix above)
+    — confirms the calendar's real source of truth is the `bookings`
+    table overlap check, not `blocked_dates`, exactly as reasoned
+    through when that bug was found. Nothing needed fixing here.
+  - Live WhatsApp flow test: went through the actual public
+    `/booking` page on `dizeden.com` (not the dev server) with a
+    clearly-labeled test guest, submitted, and verified directly via
+    SQL that the booking saved as `pending` with the correct total and
+    that **both nights correctly got `blocked_dates` rows** — proof
+    the RLS fix (`allow_anon_insert_blocked_dates`) is working in
+    production, not just in the earlier dev-preview test. Confirmation
+    screen text verified via `get_page_text` (reference, property,
+    dates, "Total Due" all correct). Note: reading the captured
+    `window.open` URL directly via `javascript_tool` was blocked by
+    that tool's own safety guard (it pattern-matches on
+    query-string-shaped content) — not a bug, just means that specific
+    check had to rely on the earlier dev-preview verification of the
+    URL format instead. Test data deleted via SQL afterward; confirmed
+    the database is back to exactly the one real booking (Henry's).
+
 ## In Progress
 
 - **GA4 key-event configuration is blocked pending access approval.**
