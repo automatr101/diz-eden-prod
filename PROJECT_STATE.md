@@ -699,16 +699,65 @@ All of the above verified live on `dizeden.com` after each deploy (Vercel auto-d
     actually opened the right chat was never confirmed by the user
     either.
 
-## In Progress
+## Completed (continued — most recent phase)
 
-- **🔴 URGENT — check this first**: real guest Henry Boateng (booking
-  `DE-MTHF80V4`, GH₵1,200, check-in 2026-08-31) paid through Paystack's
-  test key, so no real money was charged despite the booking showing
-  "confirmed." Two pending decisions, both the user's to make: how to
-  collect real payment from Henry, and when to switch Paystack to a
-  live key (needs the user's own live publishable key). Full writeup
-  in Completed under "Live, unresolved business issue." Do not assume
-  this is resolved — verify with the user first.
+- **Replaced Paystack checkout with a WhatsApp-handoff booking flow**
+  (commit `74bfc1e`), per explicit client request relayed by the user:
+  no online payment gateway at all — the guest fills in dates/details
+  exactly as before, but "Pay Now" is now "Book via WhatsApp." On
+  click: the booking saves as `pending`, dates get held, the host gets
+  notified, and WhatsApp opens **on the guest's own device**, addressed
+  to the host's number, with name/room/dates/guests/total already
+  typed out — the guest sends it themselves, so this is their message,
+  not one sent on their behalf. Payment is then arranged directly
+  between guest and host over WhatsApp; the host confirms the booking
+  from the existing admin dashboard (Bookings panel status buttons —
+  no new admin UI needed) once paid.
+  - `Booking.tsx`: removed the entire Paystack call path
+    (`launchPaystack`, `handleCallback`, `handlePaymentSuccess`, the
+    `trxref` callback effect, the `PaystackPop` global declaration).
+    Confirmation screen copy corrected to not imply payment happened —
+    "Booking Confirmed" → "Booking Request Sent", "Total Paid" →
+    "Total Due" — since nothing is charged at this point. Analytics
+    changed from `begin_checkout`/`purchase` to `generate_lead`, since
+    firing `purchase` on an unpaid pending booking would corrupt GA4
+    revenue numbers.
+  - `telegram.ts`: new `tg.whatsappBookingRequest()` notification,
+    wording reflecting "awaiting payment via WhatsApp" rather than
+    "payment confirmed."
+  - `index.html`: removed the now-unused Paystack `inline.js` script
+    tag — nothing references `window.PaystackPop` anymore.
+  - **Deliberately NOT deleted**: `tg.newBooking()` and the
+    `create-payment`/`verify-payment` edge functions stay in place,
+    unused, in case Paystack is ever reactivated — no rebuild needed
+    if that decision changes later.
+  - **Real pre-existing bug found and fixed along the way**:
+    `blocked_dates` had no `INSERT` policy for anonymous users, only
+    `authenticated`. This meant guest self-checkout — both the old
+    Paystack flow and this new WhatsApp flow — could never actually
+    create its own `blocked_dates` rows. Confirmed on a real booking
+    (Henry Boateng, `DE-MTHF80V4`): zero `blocked_dates` rows despite
+    being confirmed. No actual double-booking exposure resulted,
+    because `checkAvailability()` independently checks the `bookings`
+    table for date overlaps too and that check has always worked — but
+    the `blocked_dates` side (admin calendar bookkeeping, the
+    cancel/delete cleanup logic built earlier this session) has been
+    silently non-functional for every guest booking to date. Fixed via
+    migration `allow_anon_insert_blocked_dates` (adds an anonymous
+    INSERT policy, same trust model `bookings` itself already uses),
+    applied after explicit user confirmation.
+  - Verified end-to-end in the dev preview: intercepted `window.open`
+    to confirm the `wa.me` URL is exactly right (host number, full
+    pre-filled message), confirmed the booking saves as `pending`,
+    confirmed `blocked_dates` rows are created (2 rows for a 2-night
+    stay) — but only after the RLS fix; re-tested and failed
+    reproducibly before it, succeeded after. Test data cleaned up via
+    SQL afterward; real data (Henry's booking) confirmed untouched.
+    `tsc --noEmit`/`vite build` clean. Live on `dizeden.com`: new
+    bundle hash, "Book via WhatsApp" string present, Paystack script
+    tag confirmed gone from served HTML.
+
+## In Progress
 
 - **GA4 key-event configuration is blocked pending access approval.**
   Cannot mark `purchase` as a Key Event, clean up the dead stub events
@@ -721,11 +770,20 @@ All of the above verified live on `dizeden.com` after each deploy (Vercel auto-d
   one of those resolves — re-check access status next time this comes
   up rather than assuming still blocked or assuming resolved.
 
+- **Paystack live-key switch is no longer blocking bookings from happening**
+  — as of `74bfc1e`, the site takes bookings via WhatsApp instead of an
+  online gateway, so there's no live-payment dependency for the booking
+  flow to work at all anymore. The Henry Boateng incident (see Completed,
+  earlier phase) — his booking is now marked `confirmed` in the DB, which
+  suggests it was resolved on the user's end, but that was only observed
+  as a side effect of unrelated testing, not confirmed by the user
+  directly — worth a quick check-in rather than assuming. The live-key
+  question still matters if the user ever wants online card/mobile-money
+  payment back instead of the manual WhatsApp handoff, but it's now a
+  "someday" decision, not an urgent one.
 - **Awaiting user action, not blocked on code**: (a) add `https://www.dizeden.com`
   as the Website on the "Diz Eden luxury Apartments" Google Business Profile,
-  (b) decide whether/how to pursue backlink-building, (c) the Paystack
-  live-key switch above is now urgent, not just "whenever ready" — a real
-  guest already slipped through on the test key.
+  (b) decide whether/how to pursue backlink-building.
 - Launch checklist itself is fully complete; nothing left there.
 - **Database is now empty** (0 bookings, 0 blocked_dates) as of this wipe —
   expected and intentional, not a bug, if anyone checks admin Overview next
