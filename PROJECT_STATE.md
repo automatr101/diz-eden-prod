@@ -774,13 +774,11 @@ All of the above verified live on `dizeden.com` after each deploy (Vercel auto-d
   — as of `74bfc1e`, the site takes bookings via WhatsApp instead of an
   online gateway, so there's no live-payment dependency for the booking
   flow to work at all anymore. The Henry Boateng incident (see Completed,
-  earlier phase) — his booking is now marked `confirmed` in the DB, which
-  suggests it was resolved on the user's end, but that was only observed
-  as a side effect of unrelated testing, not confirmed by the user
-  directly — worth a quick check-in rather than assuming. The live-key
-  question still matters if the user ever wants online card/mobile-money
-  payment back instead of the manual WhatsApp handoff, but it's now a
-  "someday" decision, not an urgent one.
+  earlier phase) is **closed** — user confirmed directly (2026-09-07) he
+  spoke with Henry and it's sorted. The live-key question still matters
+  only if the user ever wants online card/mobile-money payment back
+  instead of the manual WhatsApp handoff — a "someday" decision now, not
+  an urgent one.
 - **Awaiting user action, not blocked on code**: (a) add `https://www.dizeden.com`
   as the Website on the "Diz Eden luxury Apartments" Google Business Profile,
   (b) decide whether/how to pursue backlink-building.
