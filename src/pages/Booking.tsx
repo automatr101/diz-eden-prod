@@ -4,10 +4,9 @@ import { format, differenceInCalendarDays, addDays, isBefore } from "date-fns";
 import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { tg } from "@/lib/telegram";
-import { emailApi } from "@/lib/emails";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
-import { BedDouble, Users, CalendarDays, CheckCircle2, Loader2, Shield, CalendarIcon, Info, CreditCard, Zap } from "lucide-react";
+import { Users, CalendarDays, Loader2, Shield, CalendarIcon, Info, MessageCircle, Clock } from "lucide-react";
 import AvailabilityCalendar from "@/components/booking/AvailabilityCalendar";
 import { useAvailability } from "@/hooks/useAvailability";
 import { DateRange } from "react-day-picker";
@@ -15,27 +14,13 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { trackEvent } from "@/lib/analytics";
 
-declare global {
-  interface Window {
-    PaystackPop: {
-      setup: (options: {
-        key: string;
-        email: string;
-        amount: number; // in kobo (pesewas for GHS)
-        currency: string;
-        ref: string;
-        metadata?: Record<string, unknown>;
-        onClose: () => void;
-        callback: (response: { reference: string; status: string }) => void;
-      }) => { openIframe: () => void };
-    };
-  }
-}
-
 import { apartment1BR, apartment2BR } from "@/lib/properties";
+
+// Same host WhatsApp number used sitewide (Footer, BookingConfirmation).
+const HOST_WHATSAPP_NUMBER = "233256071641";
 import { useDocumentMeta } from "@/hooks/useDocumentMeta";
 
-type Step = "details" | "payment" | "confirmed";
+type Step = "details" | "confirmed";
 
 // ─── SECURITY: Input sanitization ────────────────────────────────────────────
 function sanitizeInput(str: string): string {
@@ -49,7 +34,7 @@ let lastSubmissionTime = 0;
 export default function Booking() {
   useDocumentMeta({
     title: "Reserve Your Stay — Diz Eden",
-    description: "Book your luxury 1 or 2-bedroom serviced apartment at Diz Eden, East Legon, Accra. Secure checkout via Paystack.",
+    description: "Book your luxury 1 or 2-bedroom serviced apartment at Diz Eden, East Legon, Accra. Reserve directly via WhatsApp.",
     path: "/booking",
   });
 
@@ -191,7 +176,7 @@ export default function Booking() {
     return Object.keys(errs).length === 0;
   };
 
-  const handleProceedToPayment = async () => {
+  const handleBookViaWhatsApp = async () => {
     if (!validateForm()) {
       // Find the first error element and scroll to it
       const firstError = document.querySelector(".border-red-500, .bg-red-500\\/10");
@@ -226,102 +211,23 @@ export default function Booking() {
       return;
     }
 
-    const paystackKey = import.meta.env.VITE_PAYSTACK_PUBLIC_KEY;
-    if (!paystackKey) {
-      alert("System Configuration Error: Paystack Public Key is missing. Please check your .env file and restart the development server (npm run dev).");
-      return;
-    }
-
     setPaying(true);
     const available = await checkAvailability();
-
     if (!available) {
-      setPaying(false);
-      return;
-    }
-
-    setStep("payment");
-    launchPaystack(paystackKey);
-  };
-
-  const launchPaystack = (paystackKey: string) => {
-    if (!window.PaystackPop) {
-      alert("Payment system not loaded. Please disable your adblocker and refresh.");
       setPaying(false);
       return;
     }
 
     const ref = `DE-${Date.now().toString(36).toUpperCase()}`;
 
-    try {
-      const handler = window.PaystackPop.setup({
-        key: paystackKey,
-        email: form.email,
-        amount: totalPesewas,
-        currency: "GHS",
-        ref: ref,
-        metadata: {
-          custom_fields: [
-            { display_name: "Guest Name", variable_name: "guest_name", value: form.name },
-            { display_name: "Phone", variable_name: "phone", value: form.phone },
-            { display_name: "Apartment", variable_name: "rooms", value: `${rooms} Bedroom` },
-            { display_name: "Check-in", variable_name: "check_in", value: checkIn },
-            { display_name: "Check-out", variable_name: "check_out", value: checkOut },
-          ],
-        },
-        callback: (response: any) => {
-          handlePaymentSuccess(response.reference, ref).catch(console.error);
-        },
-        onClose: () => {
-          setPaying(false);
-          setStep("details");
-        },
-      });
-
-      handler.openIframe();
-      tg.bookingStarted({ guestName: form.name, total: totalPesewas / 100, ref }).catch(console.error);
-      trackEvent("begin_checkout", {
-        currency: "GHS",
-        value: totalGHS,
-        items: [{ item_name: `${rooms} Bedroom`, price: basePrice, quantity: nights }],
-      });
-    } catch (err: any) {
-      console.error("Paystack Error:", err);
-      alert("Payment window failed to open. Please try again.");
-      setPaying(false);
-    }
-  };
-
-  const handleCallback = async (ref: string) => {
-    setPaying(true);
-    const saved = localStorage.getItem("pending_booking");
-    if (saved) {
-      const b = JSON.parse(saved);
-      setForm(b.form);
-      await handlePaymentSuccess(ref, b.ref);
-      localStorage.removeItem("pending_booking");
-    } else {
-      setStep("details");
-      setPaying(false);
-    }
-  };
-
-  useEffect(() => {
-    const trxRef = params.get("trxref") || params.get("reference");
-    if (trxRef) {
-      handleCallback(trxRef);
-    }
-  }, [params]);
-
-  const handlePaymentSuccess = async (paystackRef: string, internalRef: string) => {
-    setPaying(true);
-
-    // 1. Save booking to Supabase as PENDING (with sanitized inputs)
+    // 1. Save the booking as pending — held the same way every other booking
+    // source holds dates, so the availability check above (and every other
+    // guest's calendar) already excludes it from this point on.
     const { error } = await supabase.from("bookings").insert({
-      booking_reference: internalRef,
-      guest_name: sanitizeInput(form.name),
-      guest_email: sanitizeInput(form.email),
-      guest_phone: sanitizeInput(form.phone),
+      booking_reference: ref,
+      guest_name: sanitizedForm.name,
+      guest_email: sanitizedForm.email,
+      guest_phone: sanitizedForm.phone,
       check_in: checkIn,
       check_out: checkOut,
       num_guests: guests,
@@ -329,79 +235,69 @@ export default function Booking() {
       nightly_rate: basePrice,
       total_amount: totalGHS,
       currency: "GHS",
-      status: "pending", // ── SECURITY: Start as pending until server verifies ──
-      special_requests: form.notes || null,
-      stripe_payment_id: paystackRef,
-      apartment_type: `${rooms} Bedroom`,
+      status: "pending",
+      special_requests: sanitizedForm.notes || null,
     });
 
     if (error) {
       console.error("Failed to save booking:", error);
+      alert("Something went wrong saving your booking. Please try again, or message us directly on WhatsApp.");
+      setPaying(false);
+      return;
     }
 
-    // 2. ── SECURITY: Server-side payment verification ──
-    try {
-      const { data: verifyResult } = await supabase.functions.invoke("verify-payment", {
-        body: {
-          reference: paystackRef,
-          expectedAmount: totalGHS,
-          bookingRef: internalRef,
-        },
-      });
-
-      if (!verifyResult?.verified) {
-        console.warn("Server verification flagged this payment:", verifyResult);
-        // The Edge Function already flagged the booking in the DB
-      }
-    } catch (verifyErr) {
-      // If verification service is unavailable, the booking stays as "pending"
-      // for manual admin review — fail-safe, not fail-open
-      if (import.meta.env.DEV) {
-        console.warn("Payment verification service unavailable:", verifyErr);
-      }
-    }
-
-    // 2. Block the dates
+    // 2. Block the dates — same "Booked: {ref}" convention every other
+    // booking source uses, so cancellation/deletion cleanup and the
+    // admin/guest calendars all work without any special-casing.
     const datesToBlock = [];
     const start = new Date(checkIn);
     const end = new Date(checkOut);
     for (let d = new Date(start); isBefore(d, end); d = addDays(d, 1)) {
-      datesToBlock.push({ date: format(d, "yyyy-MM-dd"), reason: `Booked: ${internalRef}` });
+      datesToBlock.push({ date: format(d, "yyyy-MM-dd"), reason: `Booked: ${ref}` });
     }
     if (datesToBlock.length > 0) {
       await supabase.from("blocked_dates").insert(datesToBlock);
     }
 
-    // 3. Send Telegram notification
-    await tg.newBooking({
-      guestName: form.name,
-      guestPhone: form.phone,
+    // 3. Notify the host
+    await tg.whatsappBookingRequest({
+      guestName: sanitizedForm.name,
+      guestPhone: sanitizedForm.phone,
       bedrooms: rooms,
       checkIn: format(new Date(checkIn), "dd MMM yyyy"),
       checkOut: format(new Date(checkOut), "dd MMM yyyy"),
       nights,
       total: totalGHS,
-      ref: internalRef,
+      ref,
     });
 
-    // Send the beautiful Email confirmation to the guest instantly!
-    emailApi.sendConfirmation({
-      to: form.email,
-      name: form.name,
-      bookingRef: internalRef,
-      checkIn: format(new Date(checkIn), "dd MMM yyyy"),
-      checkOut: format(new Date(checkOut), "dd MMM yyyy"),
-      propertyName: selectedApartment.name,
-    });
-
-    trackEvent("purchase", {
-      transaction_id: internalRef,
+    // Lead, not a purchase — no payment has happened yet at this point.
+    trackEvent("generate_lead", {
       currency: "GHS",
       value: totalGHS,
       items: [{ item_name: `${rooms} Bedroom`, price: basePrice, quantity: nights }],
     });
 
-    setBookingRef(internalRef);
+    // 4. Open WhatsApp on the guest's own device, addressed to the host,
+    // with everything the host needs already typed out. The guest sends it
+    // themselves — this is their message, not one sent on their behalf.
+    const waMessage =
+      `Hi Diz Eden! I'd like to book:\n\n` +
+      `Name: ${sanitizedForm.name}\n` +
+      `Room: ${rooms}-Bedroom\n` +
+      `Check-in: ${format(new Date(checkIn), "dd MMM yyyy")}\n` +
+      `Check-out: ${format(new Date(checkOut), "dd MMM yyyy")}\n` +
+      `Guests: ${guests}\n` +
+      `Total: GH₵${totalGHS.toLocaleString()}\n` +
+      `Ref: ${ref}` +
+      (sanitizedForm.notes ? `\nNotes: ${sanitizedForm.notes}` : "");
+
+    window.open(
+      `https://api.whatsapp.com/send?phone=${HOST_WHATSAPP_NUMBER}&text=${encodeURIComponent(waMessage)}`,
+      "_blank"
+    );
+
+    setBookingRef(ref);
     setStep("confirmed");
     setPaying(false);
   };
@@ -418,13 +314,14 @@ export default function Booking() {
             className="max-w-lg w-full text-center"
           >
             <div className="w-20 h-20 rounded-full bg-green-500/20 border border-green-500/30 flex items-center justify-center mx-auto mb-8">
-              <CheckCircle2 size={40} className="text-green-400" />
+              <MessageCircle size={40} className="text-green-400" />
             </div>
             <h1 className="text-4xl font-display font-light text-white mb-3">
-              Booking <em className="italic text-gold">Confirmed</em>
+              Booking Request <em className="italic text-gold">Sent</em>
             </h1>
             <p className="text-cream/60 mb-6">
-              Thank you, <strong className="text-white">{form.name}</strong>! Your stay at Diz Eden is reserved.
+              Thank you, <strong className="text-white">{form.name}</strong>! We've opened WhatsApp with your booking
+              details — hit send there and we'll confirm your stay and arrange payment.
             </p>
             <div className="bg-white/5 border border-white/10 rounded-2xl p-6 mb-8 text-left space-y-3">
               <div className="flex justify-between text-sm">
@@ -444,13 +341,13 @@ export default function Booking() {
                 <span className="text-white">{format(new Date(checkOut), "dd MMM yyyy")}</span>
               </div>
               <div className="flex justify-between text-sm border-t border-white/10 pt-3">
-                <span className="text-cream/50">Total Paid</span>
+                <span className="text-cream/50">Total Due</span>
                 <span className="text-white font-display text-lg">GH₵{totalGHS.toLocaleString()}</span>
               </div>
             </div>
             <p className="text-cream/40 text-sm mb-6 print:hidden">
-              A confirmation will be sent to <span className="text-cream/70">{form.email}</span>.
-              Our concierge will also reach out on WhatsApp at <span className="text-cream/70">{form.phone}</span>.
+              We've held these dates for you while we confirm. If WhatsApp didn't open automatically, message us
+              directly at <span className="text-cream/70">+233 25 607 1641</span> with your reference above.
             </p>
             <div className="flex items-center justify-center gap-3 print:hidden">
               <a
@@ -464,7 +361,7 @@ export default function Booking() {
                 onClick={() => window.print()}
                 className="inline-block border border-white/20 text-white font-bold text-[10px] sm:text-xs uppercase tracking-widest px-8 py-3 sm:px-10 sm:py-4 rounded-full hover:bg-white/10 transition-all"
               >
-                Print Receipt
+                Print Details
               </button>
             </div>
           </motion.div>
@@ -699,33 +596,33 @@ export default function Booking() {
                 </div>
 
                 <button
-                  onClick={handleProceedToPayment}
+                  onClick={handleBookViaWhatsApp}
                   disabled={paying || nights < 1 || !!availabilityError}
                   className="w-full bg-gold text-eden font-bold text-[10px] sm:text-xs uppercase tracking-[0.2em] py-4 sm:py-5 rounded-2xl hover:bg-white transition-all duration-300 disabled:opacity-40 flex items-center justify-center gap-2 shadow-[0_15px_30px_-10px_rgba(212,175,55,0.5)]"
                 >
                   {paying ? (
                     <><Loader2 size={14} className="animate-spin" /> Processing...</>
                   ) : (
-                    <>Pay GH₵{totalGHS.toLocaleString() || "—"} Securely</>
+                    <><MessageCircle size={14} /> Book via WhatsApp — GH₵{totalGHS.toLocaleString() || "—"}</>
                   )}
                 </button>
 
                 <div className="mt-5 pt-5 border-t border-white/5 grid grid-cols-3 gap-2 text-center">
                   <div className="flex flex-col items-center gap-1.5 text-cream/40">
                     <Shield size={16} className="text-gold/70" />
-                    <span className="text-[9px] uppercase tracking-wider leading-tight">SSL Secured</span>
+                    <span className="text-[9px] uppercase tracking-wider leading-tight">Secure & Private</span>
                   </div>
                   <div className="flex flex-col items-center gap-1.5 text-cream/40">
-                    <CreditCard size={16} className="text-gold/70" />
-                    <span className="text-[9px] uppercase tracking-wider leading-tight">Card Payments</span>
+                    <MessageCircle size={16} className="text-gold/70" />
+                    <span className="text-[9px] uppercase tracking-wider leading-tight">WhatsApp Booking</span>
                   </div>
                   <div className="flex flex-col items-center gap-1.5 text-cream/40">
-                    <Zap size={16} className="text-gold/70" />
-                    <span className="text-[9px] uppercase tracking-wider leading-tight">Instant Confirmation</span>
+                    <Clock size={16} className="text-gold/70" />
+                    <span className="text-[9px] uppercase tracking-wider leading-tight">Quick Response</span>
                   </div>
                 </div>
                 <p className="mt-4 text-center text-cream/25 text-[10px]">
-                  Payments processed securely by Paystack. We never see or store your card details.
+                  We'll open WhatsApp with your booking details ready to send — payment is arranged directly with us there.
                 </p>
               </div>
 

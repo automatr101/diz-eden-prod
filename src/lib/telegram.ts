@@ -86,6 +86,36 @@ export const tg = {
       )
     ),
 
+  // Fires from the WhatsApp booking flow (Booking.tsx) instead of newBooking —
+  // no payment has happened yet at this point, the guest is messaging the
+  // host directly on WhatsApp to arrange it. The booking sits as "pending"
+  // in the DB until the host confirms it in the admin dashboard.
+  whatsappBookingRequest: (data: {
+    guestName: string;
+    guestPhone: string;
+    bedrooms: number;
+    checkIn: string;
+    checkOut: string;
+    nights: number;
+    total: number;
+    ref: string;
+  }) =>
+    sendTelegramNotification(
+      `🏠 <b>New Booking Request — Diz Eden</b>\n\n` +
+      `👤 <b>Guest:</b> ${sanitize(data.guestName)}\n` +
+      `📞 <b>Phone:</b> ${sanitize(data.guestPhone)}\n` +
+      `🛏 <b>Option:</b> ${data.bedrooms}-Bedroom Stay\n` +
+      `📅 <b>Check-in:</b> ${sanitize(data.checkIn)}\n` +
+      `📅 <b>Check-out:</b> ${sanitize(data.checkOut)}\n` +
+      `🌙 <b>Nights:</b> ${data.nights}\n` +
+      `💰 <b>Total Due:</b> GH₵${data.total.toLocaleString()}\n` +
+      `🔖 <b>Ref:</b> ${sanitize(data.ref)}\n\n` +
+      `💬 <i>Guest is messaging you on WhatsApp now to arrange payment. Dates are held as "pending" — confirm the booking in the admin dashboard once payment is received.</i>`,
+      [whatsappButton(data.guestName, data.guestPhone), telegramButton(data.guestPhone)].filter(
+        (b): b is TelegramButton => !!b
+      )
+    ),
+
   newContactForm: (data: { name: string; phone: string; message: string }) =>
     sendTelegramNotification(
       `📩 <b>New Inquiry — Diz Eden</b>\n\n` +
