@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { format, differenceInCalendarDays, addDays, isBefore } from "date-fns";
+import { format, differenceInCalendarDays } from "date-fns";
 import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { tg } from "@/lib/telegram";
@@ -71,7 +71,6 @@ export default function Booking() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [paying, setPaying] = useState(false);
   const [availabilityError, setAvailabilityError] = useState("");
-  const [bookingRef, setBookingRef] = useState("");
   const [basePrice, setBasePrice] = useState(
     initRooms === 2 ? apartment2BR.basePrice : apartment1BR.basePrice
   );
@@ -218,49 +217,16 @@ export default function Booking() {
       return;
     }
 
-    const ref = `DE-${Date.now().toString(36).toUpperCase()}`;
+    // No database write here by design — this button only builds a WhatsApp
+    // message and opens it. Nothing is booked or held until the host
+    // manually logs it in the admin dashboard after collecting payment
+    // (BookingsPanel's "Log Booking" modal, which blocks the dates as part
+    // of that same action). This is a deliberate product decision, not a
+    // missing feature — see PROJECT_STATE.md.
 
-    // 1. Save the booking as pending — held the same way every other booking
-    // source holds dates, so the availability check above (and every other
-    // guest's calendar) already excludes it from this point on.
-    const { error } = await supabase.from("bookings").insert({
-      booking_reference: ref,
-      guest_name: sanitizedForm.name,
-      guest_email: sanitizedForm.email,
-      guest_phone: sanitizedForm.phone,
-      check_in: checkIn,
-      check_out: checkOut,
-      num_guests: guests,
-      num_nights: nights,
-      nightly_rate: basePrice,
-      total_amount: totalGHS,
-      currency: "GHS",
-      status: "pending",
-      special_requests: sanitizedForm.notes || null,
-    });
-
-    if (error) {
-      console.error("Failed to save booking:", error);
-      alert("Something went wrong saving your booking. Please try again, or message us directly on WhatsApp.");
-      setPaying(false);
-      return;
-    }
-
-    // 2. Block the dates — same "Booked: {ref}" convention every other
-    // booking source uses, so cancellation/deletion cleanup and the
-    // admin/guest calendars all work without any special-casing.
-    const datesToBlock = [];
-    const start = new Date(checkIn);
-    const end = new Date(checkOut);
-    for (let d = new Date(start); isBefore(d, end); d = addDays(d, 1)) {
-      datesToBlock.push({ date: format(d, "yyyy-MM-dd"), reason: `Booked: ${ref}` });
-    }
-    if (datesToBlock.length > 0) {
-      await supabase.from("blocked_dates").insert(datesToBlock);
-    }
-
-    // 3. Notify the host
-    await tg.whatsappBookingRequest({
+    // Let the host know someone's about to message them, even if the guest
+    // never actually hits send on WhatsApp.
+    tg.whatsappLead({
       guestName: sanitizedForm.name,
       guestPhone: sanitizedForm.phone,
       bedrooms: rooms,
@@ -268,18 +234,17 @@ export default function Booking() {
       checkOut: format(new Date(checkOut), "dd MMM yyyy"),
       nights,
       total: totalGHS,
-      ref,
-    });
+    }).catch(console.error);
 
-    // Lead, not a purchase — no payment has happened yet at this point.
+    // Lead, not a purchase — nothing has been booked or paid for yet.
     trackEvent("generate_lead", {
       currency: "GHS",
       value: totalGHS,
       items: [{ item_name: `${rooms} Bedroom`, price: basePrice, quantity: nights }],
     });
 
-    // 4. Open WhatsApp on the guest's own device, addressed to the host,
-    // with everything the host needs already typed out. The guest sends it
+    // Open WhatsApp on the guest's own device, addressed to the host, with
+    // everything the host needs already typed out. The guest sends it
     // themselves — this is their message, not one sent on their behalf.
     const waMessage =
       `Hi Diz Eden! I'd like to book:\n\n` +
@@ -288,8 +253,7 @@ export default function Booking() {
       `Check-in: ${format(new Date(checkIn), "dd MMM yyyy")}\n` +
       `Check-out: ${format(new Date(checkOut), "dd MMM yyyy")}\n` +
       `Guests: ${guests}\n` +
-      `Total: GH₵${totalGHS.toLocaleString()}\n` +
-      `Ref: ${ref}` +
+      `Total: GH₵${totalGHS.toLocaleString()}` +
       (sanitizedForm.notes ? `\nNotes: ${sanitizedForm.notes}` : "");
 
     window.open(
@@ -297,7 +261,6 @@ export default function Booking() {
       "_blank"
     );
 
-    setBookingRef(ref);
     setStep("confirmed");
     setPaying(false);
   };
@@ -317,17 +280,13 @@ export default function Booking() {
               <MessageCircle size={40} className="text-green-400" />
             </div>
             <h1 className="text-4xl font-display font-light text-white mb-3">
-              Booking Request <em className="italic text-gold">Sent</em>
+              Almost There — <em className="italic text-gold">Send Your Message</em>
             </h1>
             <p className="text-cream/60 mb-6">
               Thank you, <strong className="text-white">{form.name}</strong>! We've opened WhatsApp with your booking
-              details — hit send there and we'll confirm your stay and arrange payment.
+              details ready to go — hit send there to complete your request.
             </p>
             <div className="bg-white/5 border border-white/10 rounded-2xl p-6 mb-8 text-left space-y-3">
-              <div className="flex justify-between text-sm">
-                <span className="text-cream/50">Reference</span>
-                <span className="text-gold font-mono font-bold">{bookingRef}</span>
-              </div>
               <div className="flex justify-between text-sm">
                 <span className="text-cream/50">Property</span>
                 <span className="text-white">{selectedApartment.name}</span>
@@ -346,8 +305,8 @@ export default function Booking() {
               </div>
             </div>
             <p className="text-cream/40 text-sm mb-6 print:hidden">
-              We've held these dates for you while we confirm. If WhatsApp didn't open automatically, message us
-              directly at <span className="text-cream/70">+233 25 607 1641</span> with your reference above.
+              These dates aren't reserved yet — we'll confirm together on WhatsApp. If it didn't open automatically,
+              message us directly at <span className="text-cream/70">+233 25 607 1641</span>.
             </p>
             <div className="flex items-center justify-center gap-3 print:hidden">
               <a

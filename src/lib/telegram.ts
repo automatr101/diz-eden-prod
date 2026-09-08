@@ -86,11 +86,14 @@ export const tg = {
       )
     ),
 
-  // Fires from the WhatsApp booking flow (Booking.tsx) instead of newBooking —
-  // no payment has happened yet at this point, the guest is messaging the
-  // host directly on WhatsApp to arrange it. The booking sits as "pending"
-  // in the DB until the host confirms it in the admin dashboard.
-  whatsappBookingRequest: (data: {
+  // Fires from the WhatsApp booking flow (Booking.tsx) — this is a heads-up
+  // only, not a booking notification. No database record is created by this
+  // flow at all (deliberate — see PROJECT_STATE.md): the guest is about to
+  // message the host directly on WhatsApp, and nothing is booked or held
+  // until the host manually logs it in the admin dashboard after collecting
+  // payment (BookingsPanel's "Log Booking" modal, which blocks the dates as
+  // part of that action).
+  whatsappLead: (data: {
     guestName: string;
     guestPhone: string;
     bedrooms: number;
@@ -98,19 +101,17 @@ export const tg = {
     checkOut: string;
     nights: number;
     total: number;
-    ref: string;
   }) =>
     sendTelegramNotification(
-      `🏠 <b>New Booking Request — Diz Eden</b>\n\n` +
+      `💬 <b>WhatsApp Booking Lead — Diz Eden</b>\n\n` +
       `👤 <b>Guest:</b> ${sanitize(data.guestName)}\n` +
       `📞 <b>Phone:</b> ${sanitize(data.guestPhone)}\n` +
       `🛏 <b>Option:</b> ${data.bedrooms}-Bedroom Stay\n` +
       `📅 <b>Check-in:</b> ${sanitize(data.checkIn)}\n` +
       `📅 <b>Check-out:</b> ${sanitize(data.checkOut)}\n` +
       `🌙 <b>Nights:</b> ${data.nights}\n` +
-      `💰 <b>Total Due:</b> GH₵${data.total.toLocaleString()}\n` +
-      `🔖 <b>Ref:</b> ${sanitize(data.ref)}\n\n` +
-      `💬 <i>Guest is messaging you on WhatsApp now to arrange payment. Dates are held as "pending" — confirm the booking in the admin dashboard once payment is received.</i>`,
+      `💰 <b>Total:</b> GH₵${data.total.toLocaleString()}\n\n` +
+      `<i>They're about to message you on WhatsApp to book — nothing is reserved yet. Once you collect payment, log the booking in the admin dashboard to block these dates.</i>`,
       [whatsappButton(data.guestName, data.guestPhone), telegramButton(data.guestPhone)].filter(
         (b): b is TelegramButton => !!b
       )

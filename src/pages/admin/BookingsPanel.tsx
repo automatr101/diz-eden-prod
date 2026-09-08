@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { format, differenceInCalendarDays } from "date-fns";
+import { format, differenceInCalendarDays, addDays, isBefore } from "date-fns";
 import { Loader2, CheckCircle2, XCircle, Clock, ExternalLink, Plus, X, Download } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { emailApi } from "@/lib/emails";
@@ -84,8 +84,29 @@ function LogBookingModal({ onClose, onSaved }: { onClose: () => void; onSaved: (
       status: form.status,
       special_requests: form.special_requests || null,
     });
+    if (err) {
+      setSaving(false);
+      setError(err.message);
+      return;
+    }
+
+    // Block the dates — this is the actual "block the dates once paid"
+    // step for WhatsApp-arranged bookings; same "Booked: {ref}" convention
+    // every other booking source uses, so cancellation/deletion cleanup
+    // and the availability calendar all work without any special-casing.
+    if (form.status !== "cancelled") {
+      const datesToBlock = [];
+      const start = new Date(form.check_in);
+      const end = new Date(form.check_out);
+      for (let d = new Date(start); isBefore(d, end); d = addDays(d, 1)) {
+        datesToBlock.push({ date: format(d, "yyyy-MM-dd"), reason: `Booked: ${ref}` });
+      }
+      if (datesToBlock.length > 0) {
+        await supabase.from("blocked_dates").insert(datesToBlock);
+      }
+    }
+
     setSaving(false);
-    if (err) { setError(err.message); return; }
     onSaved();
     onClose();
   };
