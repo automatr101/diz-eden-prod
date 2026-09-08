@@ -246,15 +246,17 @@ export default function Booking() {
     // Open WhatsApp on the guest's own device, addressed to the host, with
     // everything the host needs already typed out. The guest sends it
     // themselves — this is their message, not one sent on their behalf.
+    // WhatsApp's own markdown (*bold*, no HTML) — matches the emoji style
+    // already used in the Telegram notifications for consistency.
     const waMessage =
-      `Hi Diz Eden! I'd like to book:\n\n` +
-      `Name: ${sanitizedForm.name}\n` +
-      `Room: ${rooms}-Bedroom\n` +
-      `Check-in: ${format(new Date(checkIn), "dd MMM yyyy")}\n` +
-      `Check-out: ${format(new Date(checkOut), "dd MMM yyyy")}\n` +
-      `Guests: ${guests}\n` +
-      `Total: GH₵${totalGHS.toLocaleString()}` +
-      (sanitizedForm.notes ? `\nNotes: ${sanitizedForm.notes}` : "");
+      `👋 Hi Diz Eden! I'd like to book:\n\n` +
+      `👤 *Name:* ${sanitizedForm.name}\n` +
+      `🛏 *Room:* ${rooms}-Bedroom\n` +
+      `📅 *Check-in:* ${format(new Date(checkIn), "dd MMM yyyy")}\n` +
+      `📅 *Check-out:* ${format(new Date(checkOut), "dd MMM yyyy")}\n` +
+      `👥 *Guests:* ${guests}\n` +
+      `💰 *Total:* GH₵${totalGHS.toLocaleString()}` +
+      (sanitizedForm.notes ? `\n📝 *Notes:* ${sanitizedForm.notes}` : "");
 
     window.open(
       `https://api.whatsapp.com/send?phone=${HOST_WHATSAPP_NUMBER}&text=${encodeURIComponent(waMessage)}`,
