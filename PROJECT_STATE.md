@@ -787,6 +787,54 @@ All of the above verified live on `dizeden.com` after each deploy (Vercel auto-d
     URL format instead. Test data deleted via SQL afterward; confirmed
     the database is back to exactly the one real booking (Henry's).
 
+- **Correction to the WhatsApp flow above: the guest-facing click should
+  never touch the database at all** (commit `9c0e47b`). After shipping the
+  auto-block-on-click design above, the user relayed the client's actual
+  intent more precisely: "Book via WhatsApp" should be a pure
+  message-builder — open WhatsApp with everything pre-filled, nothing else.
+  No pending booking record, no auto-held dates. The host handles the whole
+  conversation and payment off-site on WhatsApp, and **only once they've
+  actually collected payment** do they go into the admin dashboard and log
+  the booking, which is what blocks the dates. The previous design's
+  auto-block-on-click was a reasonable engineering instinct (avoid a
+  double-booking race window) but not what was actually asked for — the
+  client is fine with that manual-arbitration tradeoff, matching how a
+  fully WhatsApp-run booking business already operates.
+  - `Booking.tsx`: removed the `bookings`/`blocked_dates` inserts from
+    `handleBookViaWhatsApp` entirely. It now only validates the form, runs
+    a read-only availability check (kept — still useful as a soft warning
+    before the guest messages about dates that are already taken), builds
+    the WhatsApp message, and opens it. No `booking_reference` is generated
+    since nothing is persisted, so the confirmation screen's "Reference"
+    row is gone and the copy no longer implies anything is held: "Booking
+    Request Sent" → "Almost There — Send Your Message", "We've held these
+    dates" → "These dates aren't reserved yet — we'll confirm together on
+    WhatsApp."
+  - `telegram.ts`: `tg.whatsappBookingRequest()` renamed to `tg.whatsappLead()`
+    and reworded — it's an early heads-up that a guest is about to message
+    the host, not a booking notification, since no DB record backs it
+    anymore.
+  - `BookingsPanel.tsx`: **this is where "manually block the dates" now
+    actually lives.** `LogBookingModal` now also inserts `blocked_dates`
+    rows (same `Booked: {ref}` convention as every other booking source)
+    whenever a booking is logged with a non-cancelled status — so the
+    host's single "log this WhatsApp-arranged booking" action, done after
+    collecting payment, both records it and blocks the dates in one step.
+    This also happens to close a gap flagged (but not fixed) in the
+    architecture guide written for the user's friend earlier this session
+    — `LogBookingModal` never blocked dates before this.
+  - Verified in the dev preview first: submitting the WhatsApp form creates
+    zero rows in `bookings` (confirmed via SQL), the `wa.me` message has no
+    `Ref:` line, confirmation screen matches the new copy.
+  - **Verified live on `dizeden.com`** afterward: new bundle hash, "Almost
+    There" present, old "Booking Request Sent"/held-dates copy confirmed
+    gone. Then, using the authenticated admin session, actually logged a
+    real 3-night test booking (`ZZZ LOG BLOCK TEST`, 10–13 Oct) through
+    `Log Booking` and confirmed via SQL: booking saved correctly, and
+    **exactly 3 `blocked_dates` rows created**, matching the night count.
+    Test data deleted afterward; database back to exactly the one real
+    booking (Henry's). `tsc --noEmit`/`vite build` clean.
+
 ## In Progress
 
 - **GA4 key-event configuration is blocked pending access approval.**
