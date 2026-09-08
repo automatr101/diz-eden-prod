@@ -835,6 +835,20 @@ All of the above verified live on `dizeden.com` after each deploy (Vercel auto-d
     Test data deleted afterward; database back to exactly the one real
     booking (Henry's). `tsc --noEmit`/`vite build` clean.
 
+- **Added emojis and bold formatting to the WhatsApp booking message**
+  (commit `27a0810`), matching the emoji style already used in the
+  Telegram notifications. WhatsApp doesn't render HTML, so field labels
+  use WhatsApp's own `*bold*` markdown instead of `<b>` tags. Verified in
+  the dev preview (correct emoji/formatting in the captured `wa.me` URL)
+  and confirmed live on `dizeden.com` (new bundle hash deployed).
+
+- **Post-deploy Availability calendar check**, at the user's request.
+  Confirmed clean on both the current month (September — today correctly
+  ring-highlighted, no stray data) and October (where the `ZZZ LOG BLOCK
+  TEST` booking had just been logged and cleaned up minutes earlier —
+  confirmed zero residue on Oct 10–13). Calendar continues to correctly
+  reflect real state after all the recent flow changes.
+
 ## In Progress
 
 - **GA4 key-event configuration is blocked pending access approval.**
