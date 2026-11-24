@@ -97,18 +97,27 @@ export default function Booking() {
 
     console.log("Checking availability for nights:", checkInRange);
 
-    const [blockedRes, existingRes] = await Promise.all([
-      supabase.from("blocked_dates").select("date").in("date", checkInRange),
-      supabase.from("bookings")
-        .select("check_in, check_out")
-        .neq("status", "cancelled")
-        .lt("check_in", checkOut)
-        .gt("check_out", checkIn),
-    ]);
+    let blockedRes, existingRes;
+    try {
+      [blockedRes, existingRes] = await Promise.all([
+        supabase.from("blocked_dates").select("date").in("date", checkInRange),
+        supabase.from("bookings")
+          .select("check_in, check_out")
+          .neq("status", "cancelled")
+          .lt("check_in", checkOut)
+          .gt("check_out", checkIn),
+      ]);
+    } catch (err) {
+      console.error("Availability check unreachable:", err);
+      return true;
+    }
 
+    // This check is only a courtesy warning — the host confirms every
+    // booking by hand on WhatsApp anyway. If the database can't be reached,
+    // let the guest through rather than silently blocking the booking button.
     if (blockedRes.error || existingRes.error) {
       console.error("Availability query failed:", blockedRes.error || existingRes.error);
-      return false;
+      return true;
     }
 
     const isBlocked = blockedRes.data && blockedRes.data.length > 0;
