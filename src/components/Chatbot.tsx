@@ -88,7 +88,7 @@ export const Chatbot = () => {
       console.error("Chatbot error:", error);
       const errorMsg: Message = {
         id: (Date.now() + 1).toString(),
-        text: "I'm currently experiencing a high volume of requests. Please try again in a moment or reach out to us directly via WhatsApp for immediate assistance.",
+        text: "I'm having trouble responding right now. Please reach out to us directly on WhatsApp at +233 25 607 1641 and we'll help you right away.",
         isUser: false,
         timestamp: new Date(),
       };

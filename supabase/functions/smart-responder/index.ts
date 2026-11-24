@@ -17,17 +17,17 @@ const SYSTEM_PROMPT = `You are Eden, a warm and professional AI assistant for Di
 - **Social Proof**: Guests frequently praise the "ultra-modern" design, "super clean" standards, "premium linens," and "remarkable attention to detail."
 
 ## Key Property Details & Rates
-- **1-Bedroom Luxury Suite**: GHS 1,200 per night (Intimate elegance for 2 guests)
-- **2-Bedroom Luxury Residence**: GHS 1,800 per night (Sophisticated sanctuary for up to 4 guests)
+- **1-Bedroom Luxury Suite**: GHS 1,200 per night (up to 2 guests)
+- **2-Bedroom Luxury Residence**: GHS 1,800 per night (up to 4 guests)
 - **Check-in**: 3:00 PM onwards | **Check-out**: By 11:00 AM
 - **Check-in Style**: Contactless self check-in. Guests receive GPS and codes via WhatsApp.
 - **Special Touches**: Every stay includes a "curated welcome hamper" and daily professional housekeeping.
 - **Amenities**: High-speed Wi-Fi (Starlink/Fiber), AC, gourmet kitchen, Smart TV (Netflix/Prime), 24/7 Security, Backup Power (Essential in Accra), and private parking.
 
 ## Booking & Payments
-- **Direct Booking**: Only via dizeden.vercel.app for best rates.
-- **Payment**: Secure via Paystack (Cards, Mobile Money).
-- **Automation**: Our "Autonomous Revenue Engine" handles the hard-blocking of dates instantly after payment.
+- **Direct Booking**: Guests book at www.dizeden.com/booking — they pick dates, room type and guests, fill in their details, and tap "Book via WhatsApp". That opens WhatsApp with their booking details already written, addressed to the host (+233 25 607 1641). They just tap send.
+- **Payment**: There is NO online/card payment on the website. Payment is arranged directly with the host on WhatsApp after the guest sends their request. Dates are only reserved once the host confirms and payment is received — never tell a guest their dates are held or confirmed just because they submitted the form.
+- If a guest asks to pay by card online or says the site didn't take their payment, explain this and point them to WhatsApp +233 25 607 1641.
 
 ## Cancellation & Refund Policy
 - **100% Refund**: 48+ hours before check-in.
@@ -67,11 +67,11 @@ serve(async (req) => {
       headers: {
         "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
         "Content-Type": "application/json",
-        "HTTP-Referer": "https://dizeden.vercel.app",
+        "HTTP-Referer": "https://www.dizeden.com",
         "X-Title": "Diz Eden Concierge",
       },
       body: JSON.stringify({
-        model: "google/gemini-flash-1.5",
+        model: "google/gemini-2.5-flash-lite",
         messages: [
           { role: "system", content: SYSTEM_PROMPT },
           ...messages,
@@ -97,7 +97,7 @@ serve(async (req) => {
     console.error("Chat bot error:", error.message);
     return new Response(
       JSON.stringify({
-        reply: "I'm currently experiencing a high volume of requests. Please try again in a moment or reach out to us directly via WhatsApp for immediate assistance.",
+        reply: "I'm having trouble responding right now. Please reach out to us directly on WhatsApp at +233 25 607 1641 and we'll help you right away.",
         error: error.message,
       }),
       {
