@@ -849,8 +849,90 @@ All of the above verified live on `dizeden.com` after each deploy (Vercel auto-d
   confirmed zero residue on Oct 10–13). Calendar continues to correctly
   reflect real state after all the recent flow changes.
 
+- **Supabase outage response: chatbot rebuilt on Vercel, booking button
+  made outage-proof** (commits `cb58337`, `bf9d0d5`, `8fe7644`). Triggered
+  by a GitHub "Supabase Keep-Alive failed" email (1 Oct), then the user
+  reporting the AI agent was down (24 Nov).
+  - **Root cause of the outage**: the Supabase project (`onewyserwllwyrhvpkjw`)
+    is **paused**. Evidence: Google public DNS returns NXDOMAIN for its
+    hostname (supabase.co itself resolves), the Postgres connection times
+    out while the management API still lists the edge functions, and the
+    keep-alive workflow's curl fails with exit 6 (can't resolve host)
+    on every run since 28 Sep. Note the sandbox can't reach supabase.com
+    at all, so sandbox curl alone proves nothing here; the public-DNS
+    lookup (`dns.google/resolve`) is the trustworthy check.
+  - **The keep-alive workflow has a design flaw**: pinging a *running*
+    project prevents a pause, but pinging a *paused* one does nothing, so
+    once it pauses the workflow just fails forever. Only a manual Restore
+    in the Supabase dashboard (or upgrading to Pro, which removes
+    auto-pause) fixes it. Free tier can still pause during a quiet stretch
+    no matter how often it is pinged.
+  - **The chatbot had a second, independent bug**: `smart-responder` called
+    `google/gemini-flash-1.5`, which no longer exists on OpenRouter
+    (verified against the live model list), so it would have kept failing
+    even after a restore. Its prompt also still described the old Paystack
+    checkout and `dizeden.vercel.app`, and the fallback blamed "high volume
+    of requests". All fixed in `cb58337` (model now
+    `google/gemini-2.5-flash-lite`, prompt rewritten for WhatsApp booking).
+  - **Booking button silently did nothing during the outage** (`bf9d0d5`):
+    `checkAvailability()` returned false on any query error and the
+    handler treats false as "dates unavailable" without showing a message.
+    It now fails open (the check is only a courtesy; the host confirms
+    every booking by hand). Verified in the dev preview with Supabase
+    actually down: the wa.me link opened with the right number/message.
+  - **Chatbot moved off Supabase entirely** (`8fe7644`): new `api/chat.ts`
+    Vercel serverless function reads `OPENROUTER_API_KEY` from Vercel env
+    vars (set by the user via the Vercel CLI as a Sensitive production var;
+    the repo is now linked to the Vercel project locally via `vercel link`,
+    `.vercel` is gitignored). `Chatbot.tsx` calls `/api/chat`. Hardening the
+    old function lacked: only user/assistant turns accepted (it forwarded
+    any role, so a browser could inject its own system prompt), history
+    capped at 12 messages x 1000 chars, best-effort 15/min per-IP limit,
+    20s upstream timeout, real HTTP error codes. `vercel.json` SPA rewrite
+    now excludes `/api/`. The old `supabase/functions/smart-responder` is
+    left in place, unused.
+  - **Verified live on dizeden.com**: `GET /api/chat` returns 405 JSON (so
+    the function, not the SPA, answers); a real question returned a
+    correct Eden reply with the right rates and WhatsApp booking; a "can I
+    pay by card / are my dates held?" question got the right answer (no
+    online payment, dates only reserved once the host confirms); an
+    injected `system` message was ignored. Local mocked-OpenRouter tests
+    (11 checks: validation, role filtering, truncation, rate limit, error
+    paths) all passed first.
+  - **Dev gotcha**: `/api/chat` does not exist under plain `vite` dev, so
+    the widget shows its WhatsApp fallback locally. Use `vercel dev` to
+    test the chatbot on localhost.
+  - **Still dead until Supabase is restored** (not just the chatbot):
+    bookings/blocked-date lookups and pricing (pricing falls back to the
+    hardcoded rates), the whole admin dashboard, Telegram notifications
+    and bot commands (`send-telegram`, `telegram-webhook` are Supabase edge
+    functions, so the booking-lead pings are not arriving), and the
+    confirmation/cancellation emails. The site won't warn guests about
+    already-booked dates in the meantime; clashes get caught when the host
+    confirms on WhatsApp.
+
 ## In Progress
 
+- **🔴 Supabase project is paused and needs a manual Restore** (user
+  action; Claude cannot do this). supabase.com/dashboard, open the Diz
+  Eden project, click Restore project. The 90-day restore window from the
+  pause (about 28 Sep) ends around **late December 2026**; after that the
+  data is gone. As of 25 Nov the restore had not been done (DNS still
+  NXDOMAIN). Once restored: verify DB/admin/bookings/Telegram, deploy
+  nothing for the chatbot (it no longer needs Supabase), and fix or retire
+  the keep-alive workflow (see the flaw above; Pro plan is the real fix).
+- **Cancellation policy contradicts itself on the site** (awaiting user):
+  `/cancellation` page says 100% refund at 48h+, 50% at 24-48h, none under
+  24h, but the booking-page sidebar says 100% at 7+ days, 50% at 3-6 days,
+  none under 3 days. The chatbot prompt uses the 48h version. Needs the
+  owner to say which is real, then align both pages and the prompt.
+- **Chatbot prompt contains claims nobody has verified against the
+  property**: host "Kweku, Airbnb Superhost", Starlink/Fiber Wi-Fi, backup
+  power, contactless self check-in with GPS/codes via WhatsApp, Netflix
+  *and* Prime (the site only says Netflix). They predate this session and
+  were left as-is; the owner should confirm or correct them since the bot
+  states them to guests as fact. The prompt also lives only in
+  `api/chat.ts` now (the Supabase copy is stale/unused).
 - **GA4 key-event configuration is blocked pending access approval.**
   Cannot mark `purchase` as a Key Event, clean up the dead stub events
   (`close_convert_lead`, `qualify_lead` on the wrong property), fix
@@ -875,9 +957,10 @@ All of the above verified live on `dizeden.com` after each deploy (Vercel auto-d
   as the Website on the "Diz Eden luxury Apartments" Google Business Profile,
   (b) decide whether/how to pursue backlink-building.
 - Launch checklist itself is fully complete; nothing left there.
-- **Database is now empty** (0 bookings, 0 blocked_dates) as of this wipe —
-  expected and intentional, not a bug, if anyone checks admin Overview next
-  and sees zeros.
+- **Database contents** (when reachable): exactly one real booking, Henry
+  Boateng `DE-MTHF80V4` (confirmed), and no blocked dates. Everything else
+  was test data and has been cleaned out. If the dashboard shows other
+  rows after the restore, they did not come from our tests.
 - No further copy-cleanup requests outstanding — this batch plus the
   homepage batch above cover every AI-slop/factual-accuracy issue raised
   so far. Don't proactively hunt for more copy to rewrite without the
