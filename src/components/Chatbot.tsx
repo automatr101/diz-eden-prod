@@ -2,7 +2,6 @@ import React, { useState, useRef, useEffect } from "react";
 import { MessageCircle, X, Send, Loader2, Sparkles, Headset } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { supabase } from "@/integrations/supabase/client";
 
 type Message = {
   id: string;
@@ -71,11 +70,13 @@ export const Chatbot = () => {
       
       history.push({ role: "user", content: userText });
 
-      const { data, error } = await supabase.functions.invoke("smart-responder", {
-        body: { messages: history },
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messages: history }),
       });
-
-      if (error) throw error;
+      if (!res.ok) throw new Error(`Chat request failed: ${res.status}`);
+      const data = await res.json();
 
       const botMsg: Message = {
         id: (Date.now() + 1).toString(),
