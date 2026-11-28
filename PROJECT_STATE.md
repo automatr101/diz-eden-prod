@@ -929,6 +929,15 @@ All of the above verified live on `dizeden.com` after each deploy (Vercel auto-d
     home page renders two stacked "Open AI Assistant" buttons; gallery
     photos are heavy enough to fail or stall on a weak connection.
 
+- **Demo video, follow-up versions** (28 Nov 2026), same folder:
+  `diz-eden-demo-voiceover.mp4` (desktop, 87s) and
+  `diz-eden-demo-vertical.mp4` (1080x1920 phone layout for WhatsApp,
+  81s, 8.6 MB). ElevenLabs narration (voice "Alice"; key in the Windows
+  user env var `ELEVENLABS_API_KEY`) over the user's music track, ducked
+  under speech. Before any public use: the ElevenLabs account is on the
+  free plan (no commercial licence) and the music track has no licence on
+  file. Build scripts are only in a session scratchpad, not in any repo.
+
 ## In Progress
 
 - **🔴 Supabase project is paused and needs a manual Restore** (user
