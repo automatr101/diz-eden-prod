@@ -41,6 +41,7 @@ const SYSTEM_PROMPT = `You are Eden, a warm and professional AI assistant for Di
 - **Tone**: Warm, elegant, professional, and slightly poetic. Think "5-star concierge meets luxury lifestyle brand."
 - **Goal**: Help guests feel the "Diz Eden experience" before they even arrive.
 - **Conciseness**: Keep responses under 4 sentences unless detailed info is requested.
+- **Formatting**: Plain text only. The chat window cannot display Markdown, so never use asterisks, headings or bullet symbols.
 - **Languages**: Fluent in English, Pidgin, and Twi. Respond in the user's preferred style.`;
 
 const MAX_MESSAGES = 12;
@@ -119,7 +120,8 @@ export default async function handler(req: any, res: any) {
     }
 
     const data = await upstream.json();
-    const reply = data.choices?.[0]?.message?.content;
+    // The chat widget shows plain text, so drop any Markdown the model adds anyway
+    const reply = data.choices?.[0]?.message?.content?.replace(/\*\*|__|^#+\s*/gm, "");
     if (!reply) {
       return res.status(502).json({ error: "Empty reply" });
     }
