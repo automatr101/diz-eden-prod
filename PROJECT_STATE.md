@@ -911,6 +911,24 @@ All of the above verified live on `dizeden.com` after each deploy (Vercel auto-d
     already-booked dates in the meantime; clashes get caught when the host
     confirms on WhatsApp.
 
+- **Product demo video for the owner** (28 Nov 2026), in
+  `PROSPECT/diz-eden-demo/diz-eden-demo.mp4` (outside the repo): 83s,
+  1080p, silent with captions. Customer journey recorded from the live
+  site (home, residences, AI concierge, 2-bedroom booking, WhatsApp
+  handoff), then an illustrated WhatsApp message (exact generated text,
+  labelled as an illustration) and a "what you do next" card. Supabase and
+  analytics were blocked during recording so no alerts were sent. The
+  admin dashboard is not shown because Supabase is still paused.
+  - Found while recording, fixed (`5c2994e`): chatbot replies showed raw
+    `**` Markdown; prompt now asks for plain text and `api/chat.ts` strips
+    leftovers.
+  - Found while recording, **not fixed**: home FAQ "Is it safe to pay
+    online?" and the Privacy page still say payments go through Paystack
+    (false since the WhatsApp change); with Supabase down, "Book via
+    WhatsApp" sits on "Processing..." about 7s before WhatsApp opens;
+    home page renders two stacked "Open AI Assistant" buttons; gallery
+    photos are heavy enough to fail or stall on a weak connection.
+
 ## In Progress
 
 - **🔴 Supabase project is paused and needs a manual Restore** (user
